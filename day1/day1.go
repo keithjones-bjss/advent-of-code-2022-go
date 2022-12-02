@@ -2,18 +2,16 @@ package day1
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"sort"
 	"strconv"
 )
 
-func Run() {
+func Top(filename string) []int64 {
 	current := int64(0)
 	top := []int64{0, 0, 0}
 
-	filename := "files/day1_input.txt"
 	file, error := os.Open(filename)
 	if error != nil {
 		log.Fatalf("Can't open %s: %s", filename, error)
@@ -39,6 +37,9 @@ func Run() {
 			current += value
 		}
 	}
+	if error = scanner.Err(); error != nil {
+		log.Fatal(error)
+	}
 
 	if top[0] < current {
 		top[0] = current
@@ -47,15 +48,13 @@ func Run() {
 		})
 	}
 
+	return top
+}
+
+func Sum(array []int64) int64 {
 	sum := int64(0)
-	for _, value := range top {
+	for _, value := range array {
 		sum += value
 	}
-
-	fmt.Printf("Part 1: %d\n", top[2]) // Part 1
-	fmt.Printf("Part 2: %d\n", sum)    // Part 2
-
-	if error = scanner.Err(); error != nil {
-		log.Fatal(error)
-	}
+	return sum
 }
