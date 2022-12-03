@@ -7,13 +7,13 @@ import (
 
 func TestPart1(t *testing.T) {
 	top := Top("test.txt")
-	testlib.AssertEqualInt64(t, top[0], 10000)
-	testlib.AssertEqualInt64(t, top[1], 11000)
-	testlib.AssertEqualInt64(t, top[2], 24000)
+	testlib.AssertEqual(t, top[0], 10000)
+	testlib.AssertEqual(t, top[1], 11000)
+	testlib.AssertEqual(t, top[2], 24000)
 }
 
 func TestPart2(t *testing.T) {
 	top := Top("test.txt")
 	sum := Sum(top)
-	testlib.AssertEqualInt64(t, sum, 45000)
+	testlib.AssertEqual(t, sum, 45000)
 }

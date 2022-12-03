@@ -1,14 +1,10 @@
 package testlib
 
-import "testing"
+import (
+	"testing"
+)
 
-func AssertEqualInt(t *testing.T, actual int, expected int) {
-	if actual != expected {
-		t.Errorf("Expected value %d, got %d", expected, actual)
-	}
-}
-
-func AssertEqualInt64(t *testing.T, actual int64, expected int64) {
+func AssertEqual[T int | int64 | string](t *testing.T, actual T, expected T) {
 	if actual != expected {
 		t.Errorf("Expected value %d, got %d", expected, actual)
 	}
