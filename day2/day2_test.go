@@ -96,11 +96,11 @@ func TestPart2Score_Scissors_Scissors(t *testing.T) {
 }
 
 func TestPart1(t *testing.T) {
-	score, _ := Run("../files/day2_test.txt")
+	score, _ := Run("test.txt")
 	testlib.AssertEqualInt(t, score, 15)
 }
 
 func TestPart2(t *testing.T) {
-	_, score := Run("../files/day2_test.txt")
+	_, score := Run("test.txt")
 	testlib.AssertEqualInt(t, score, 12)
 }
