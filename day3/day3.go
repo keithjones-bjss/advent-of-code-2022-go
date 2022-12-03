@@ -75,7 +75,7 @@ func Intersection(strings []string) string {
 	return MapKeysToString(filteredChars)
 }
 
-func MapKeysToString(m map[rune]int) string {
+func MapKeysToString[T any](m map[rune]T) string {
 	var result []byte
 	for char := range m {
 		result = utf8.AppendRune(result, char)

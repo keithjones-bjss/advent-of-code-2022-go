@@ -32,20 +32,20 @@ func TestDistinctChars(t *testing.T) {
 
 func TestMapFilter(t *testing.T) {
 	m := make(map[rune]int)
-	m[97] = 1
-	m[98] = 1
-	m[99] = 1
-	result := MapFilter(m, func(key rune, _ int) bool { return key == 97 })
-	testlib.AssertMapContainsKey(t, result, 97)
-	testlib.AssertMapDoesNotContainKey(t, result, 98)
-	testlib.AssertMapDoesNotContainKey(t, result, 99)
+	m['a'] = 1
+	m['b'] = 1
+	m['c'] = 1
+	result := MapFilter(m, func(key rune, _ int) bool { return key == 'a' })
+	testlib.AssertMapContainsKey(t, result, 'a')
+	testlib.AssertMapDoesNotContainKey(t, result, 'b')
+	testlib.AssertMapDoesNotContainKey(t, result, 'c')
 }
 
 func TestMapKeysToString(t *testing.T) {
-	m := make(map[rune]int)
-	m[97] = 1
-	m[98] = 1
-	m[99] = 1
+	m := make(map[rune]bool)
+	m['a'] = false
+	m['b'] = false
+	m['c'] = false
 	result := MapKeysToString(m)
 	testlib.AssertStringContains(t, result, "a")
 	testlib.AssertStringContains(t, result, "b")
