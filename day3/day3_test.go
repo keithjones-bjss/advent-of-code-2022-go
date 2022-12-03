@@ -30,6 +30,17 @@ func TestDistinctChars(t *testing.T) {
 	testlib.AssertEqual(t, result, "abc")
 }
 
+func TestMapFilter(t *testing.T) {
+	m := make(map[rune]int)
+	m[97] = 1
+	m[98] = 1
+	m[99] = 1
+	result := MapFilter(m, func(key rune, _ int) bool { return key == 97 })
+	testlib.AssertMapContainsKey(t, result, 97)
+	testlib.AssertMapDoesNotContainKey(t, result, 98)
+	testlib.AssertMapDoesNotContainKey(t, result, 99)
+}
+
 func TestMapKeysToString(t *testing.T) {
 	m := make(map[rune]int)
 	m[97] = 1

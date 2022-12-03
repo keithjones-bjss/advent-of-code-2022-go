@@ -51,9 +51,9 @@ func Part2Score(rucksacks []string) int {
 	return Priority(result)
 }
 
-type FilterFunction[K comparable, V any] func(key K, value V) bool
+type MapFilterFunction[K comparable, V any] func(key K, value V) bool
 
-func Filter[K comparable, V any](m map[K]V, function FilterFunction[K, V]) map[K]V {
+func MapFilter[K comparable, V any](m map[K]V, function MapFilterFunction[K, V]) map[K]V {
 	n := make(map[K]V)
 	for key, value := range m {
 		if function(key, value) {
@@ -71,7 +71,7 @@ func Intersection(strings []string) string {
 			commonChars[char]++
 		}
 	}
-	filteredChars := Filter(commonChars, func(_ rune, value int) bool { return value == len(strings) })
+	filteredChars := MapFilter(commonChars, func(_ rune, value int) bool { return value == len(strings) })
 	return MapKeysToString(filteredChars)
 }
 

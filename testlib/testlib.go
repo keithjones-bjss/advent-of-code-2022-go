@@ -13,6 +13,20 @@ func AssertEqual[T comparable](t *testing.T, actual T, expected T) {
 
 func AssertStringContains(t *testing.T, str string, substring string) {
 	if !strings.Contains(str, substring) {
-		t.Errorf("Expected to find substring \"%v\" in \"%v\"", str, substring)
+		t.Errorf("Expected to find substring \"%v\" in \"%v\"", substring, str)
+	}
+}
+
+func AssertMapContainsKey[K comparable, V any](t *testing.T, m map[K]V, key K) {
+	_, present := m[key]
+	if !present {
+		t.Errorf("Expected to find key \"%v\" in \"%v\"", key, m)
+	}
+}
+
+func AssertMapDoesNotContainKey[K comparable, V any](t *testing.T, m map[K]V, key K) {
+	_, present := m[key]
+	if present {
+		t.Errorf("Did not expect to find key \"%v\" in \"%v\"", key, m)
 	}
 }
