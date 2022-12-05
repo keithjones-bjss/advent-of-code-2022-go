@@ -11,6 +11,17 @@ func AssertEqual[T comparable](t *testing.T, actual T, expected T) {
 	}
 }
 
+func AssertArrayEqual[T comparable](t *testing.T, actual []T, expected []T) {
+	if len(actual) != len(expected) {
+		t.Errorf("Expected array %v(len=%v), got %v (len=%v)", expected, len(expected), actual, len(actual))
+	}
+	for index, _ := range expected {
+		if actual[index] != expected[index] {
+			t.Errorf("Expected value %v at index %v, got %v", expected[index], index, actual[index])
+		}
+	}
+}
+
 func AssertStringContains(t *testing.T, str string, substring string) {
 	if !strings.Contains(str, substring) {
 		t.Errorf("Expected to find substring \"%v\" in \"%v\"", substring, str)

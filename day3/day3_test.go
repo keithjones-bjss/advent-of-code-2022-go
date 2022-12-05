@@ -25,38 +25,6 @@ func TestPriorityUpperCaseZ(t *testing.T) {
 	testlib.AssertEqual(t, result, 52)
 }
 
-func TestDistinctChars(t *testing.T) {
-	result := DistinctChars("aaabbc")
-	testlib.AssertEqual(t, result, "abc")
-}
-
-func TestMapFilter(t *testing.T) {
-	m := make(map[rune]int)
-	m['a'] = 1
-	m['b'] = 1
-	m['c'] = 1
-	result := MapFilter(m, func(key rune, _ int) bool { return key == 'a' })
-	testlib.AssertMapContainsKey(t, result, 'a')
-	testlib.AssertMapDoesNotContainKey(t, result, 'b')
-	testlib.AssertMapDoesNotContainKey(t, result, 'c')
-}
-
-func TestMapKeysToString(t *testing.T) {
-	m := make(map[rune]bool)
-	m['a'] = false
-	m['b'] = false
-	m['c'] = false
-	result := MapKeysToString(m)
-	testlib.AssertStringContains(t, result, "a")
-	testlib.AssertStringContains(t, result, "b")
-	testlib.AssertStringContains(t, result, "c")
-}
-
-func TestIntersection(t *testing.T) {
-	result := Intersection([]string{"abc", "bdf"})
-	testlib.AssertEqual(t, result, "b")
-}
-
 func TestPart1Score(t *testing.T) {
 	result := Part1Score("vJrwpWtwJgWrhcsFMMfFFhFp")
 	testlib.AssertEqual(t, result, 16)
