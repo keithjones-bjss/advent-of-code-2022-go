@@ -16,15 +16,15 @@ func TestMapFilter(t *testing.T) {
 	testlib.AssertMapDoesNotContainKey(t, result, 'c')
 }
 
-func TestMapKeysToString(t *testing.T) {
+func TestMapKeysToArray(t *testing.T) {
 	m := make(map[rune]bool)
 	m['a'] = false
 	m['b'] = false
 	m['c'] = false
-	result := MapKeysToString(m)
-	testlib.AssertStringContains(t, result, "a")
-	testlib.AssertStringContains(t, result, "b")
-	testlib.AssertStringContains(t, result, "c")
+	result := MapKeysToArray(m)
+	testlib.AssertContains(t, result, 'a')
+	testlib.AssertContains(t, result, 'b')
+	testlib.AssertContains(t, result, 'c')
 }
 
 func TestStringIntersection(t *testing.T) {
@@ -35,6 +35,11 @@ func TestStringIntersection(t *testing.T) {
 func TestIntersection(t *testing.T) {
 	result := Intersection([][]int{{1, 2, 3}, {3, 4, 5}})
 	testlib.AssertArrayEqual(t, result, []int{3})
+}
+
+func TestAnyMatch(t *testing.T) {
+	result := AnyMatch([][]int{{1, 2, 3}, {3, 4, 5}, {2, 6, 7, 8}})
+	testlib.AssertArrayEqual(t, result, []int{2, 3})
 }
 
 func TestArrayEqualsWithNonMatchingArrays(t *testing.T) {
@@ -75,4 +80,12 @@ func TestContainsWithNonMatchingValue(t *testing.T) {
 func TestContainsWithEmptyValue(t *testing.T) {
 	result := Contains([]string{"abc", "bdf"}, "")
 	testlib.AssertEqual(t, result, false)
+}
+
+func TestArrayTranslate(t *testing.T) {
+	array := []int{1, 2, 3}
+	result := ArrayTranslate(array, func(_, element int) []int { return []int{element} })
+	testlib.AssertArrayEqual(t, result[0], []int{1})
+	testlib.AssertArrayEqual(t, result[1], []int{2})
+	testlib.AssertArrayEqual(t, result[2], []int{3})
 }

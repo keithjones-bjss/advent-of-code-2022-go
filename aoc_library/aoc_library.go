@@ -1,7 +1,5 @@
 package aoc_library
 
-import "unicode/utf8"
-
 type MapFilterFunction[K comparable, V any] func(key K, value V) bool
 
 func MapFilter[K comparable, V any](m map[K]V, function MapFilterFunction[K, V]) map[K]V {
@@ -12,39 +10,6 @@ func MapFilter[K comparable, V any](m map[K]V, function MapFilterFunction[K, V])
 		}
 	}
 	return n
-}
-
-func MapKeysToString[T any](m map[rune]T) string {
-	var result []byte
-	for char := range m {
-		result = utf8.AppendRune(result, char)
-	}
-	return string(result)
-}
-
-func DistinctChars(str string) string {
-	var result []byte
-	distinctChars := make(map[rune]bool)
-	for _, char := range str {
-		_, present := distinctChars[char]
-		if !present {
-			distinctChars[char] = true
-			result = utf8.AppendRune(result, char)
-		}
-	}
-	return string(result)
-}
-
-func StringIntersection(strings []string) string {
-	commonChars := make(map[rune]int)
-	for _, value := range strings {
-		distinctChars := DistinctChars(value)
-		for _, char := range distinctChars {
-			commonChars[char]++
-		}
-	}
-	filteredChars := MapFilter(commonChars, func(_ rune, value int) bool { return value == len(strings) })
-	return MapKeysToString(filteredChars)
 }
 
 func MapKeysToArray[T comparable, U any](m map[T]U) []T {
@@ -80,6 +45,27 @@ func Intersection[T comparable](arrays [][]T) []T {
 	return MapKeysToArray(filteredValues)
 }
 
+func AnyMatch[T comparable](arrays [][]T) []T {
+	commonValues := make(map[T]int)
+	for _, value := range arrays {
+		distinctValues := DistinctValues(value)
+		for _, value := range distinctValues {
+			commonValues[value]++
+		}
+	}
+	filteredValues := MapFilter(commonValues, func(_ T, value int) bool { return value > 1 })
+	return MapKeysToArray(filteredValues)
+}
+
+func StringIntersection(strings []string) string {
+	var runeArrays [][]rune
+	for _, value := range strings {
+		runeArrays = append(runeArrays, []rune(value))
+	}
+	result := Intersection(runeArrays)
+	return string(result)
+}
+
 func Contains[T comparable](array []T, element T) bool {
 	for _, value := range array {
 		if value == element {
@@ -108,4 +94,14 @@ func ArrayContains[T comparable](arrays [][]T, array []T) bool {
 		}
 	}
 	return false
+}
+
+type TranslateFunction[T any, U any] func(index int, initialValue T) U
+
+func ArrayTranslate[T any, U any](array []T, function TranslateFunction[T, U]) []U {
+	var newArray []U
+	for index, value := range array {
+		newArray = append(newArray, function(index, value))
+	}
+	return newArray
 }

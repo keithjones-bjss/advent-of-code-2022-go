@@ -1,7 +1,6 @@
 package testlib
 
 import (
-	"strings"
 	"testing"
 )
 
@@ -24,10 +23,13 @@ func AssertArrayEqual[T comparable](t *testing.T, actual []T, expected []T) {
 	}
 }
 
-func AssertStringContains(t *testing.T, str string, substring string) {
-	if !strings.Contains(str, substring) {
-		t.Errorf("Expected to find substring \"%v\" in \"%v\"", substring, str)
+func AssertContains[T comparable](t *testing.T, array []T, element T) {
+	for _, value := range array {
+		if value == element {
+			return
+		}
 	}
+	t.Errorf("Expected to find item \"%v\" in array \"%v\"", element, array)
 }
 
 func AssertMapContainsKey[K comparable, V any](t *testing.T, m map[K]V, key K) {
