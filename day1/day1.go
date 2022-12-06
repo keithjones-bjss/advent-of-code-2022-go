@@ -12,11 +12,13 @@ func Top(filename string) []int64 {
 	current := int64(0)
 	top := []int64{0, 0, 0}
 
-	file, error := os.Open(filename)
-	if error != nil {
-		log.Fatalf("Can't open %s: %s", filename, error)
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatalf("Can't open %s: %s", filename, err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		_ = file.Close()
+	}(file)
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -30,15 +32,15 @@ func Top(filename string) []int64 {
 			}
 			current = int64(0)
 		} else {
-			value, error := strconv.ParseInt(line, 10, 64)
-			if error != nil {
-				log.Fatalf("cannot parse %s: %s", line, error)
+			value, err := strconv.ParseInt(line, 10, 64)
+			if err != nil {
+				log.Fatalf("cannot parse %s: %s", line, err)
 			}
 			current += value
 		}
 	}
-	if error = scanner.Err(); error != nil {
-		log.Fatal(error)
+	if err = scanner.Err(); err != nil {
+		log.Fatal(err)
 	}
 
 	if top[0] < current {

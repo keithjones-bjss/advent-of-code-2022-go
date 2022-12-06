@@ -11,11 +11,13 @@ func Run(filename string) (int, int) {
 	part1 := 0
 	part2 := 0
 
-	file, error := os.Open(filename)
-	if error != nil {
-		log.Fatalf("Can't open %s: %s", filename, error)
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatalf("Can't open %s: %s", filename, err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		_ = file.Close()
+	}(file)
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -25,8 +27,8 @@ func Run(filename string) (int, int) {
 			part2 += Part2Score(line)
 		}
 	}
-	if error = scanner.Err(); error != nil {
-		log.Fatal(error)
+	if err = scanner.Err(); err != nil {
+		log.Fatal(err)
 	}
 	return part1, part2
 }

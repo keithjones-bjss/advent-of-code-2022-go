@@ -14,7 +14,7 @@ func AssertArrayEqual[T comparable](t *testing.T, actual []T, expected []T) {
 	if len(actual) != len(expected) {
 		t.Errorf("Expected array %v(len=%v), got %v (len=%v)", expected, len(expected), actual, len(actual))
 	}
-	for index, _ := range expected {
+	for index := range expected {
 		if len(actual) <= index {
 			t.Errorf("Expected value %v at index %v, got nothing", expected[index], index)
 		} else if actual[index] != expected[index] {

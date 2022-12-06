@@ -75,7 +75,7 @@ func ArrayEquals[T comparable](array1 []T, array2 []T) bool {
 	if len(array1) != len(array2) {
 		return false
 	}
-	for index, _ := range array1 {
+	for index := range array1 {
 		if array1[index] != array2[index] {
 			return false
 		}
