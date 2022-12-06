@@ -28,17 +28,17 @@ func TestMapKeysToArray(t *testing.T) {
 }
 
 func TestStringIntersection(t *testing.T) {
-	result := StringIntersection([]string{"abc", "bdf"})
+	result := AllStringIntersection([]string{"abc", "bdf"})
 	testlib.AssertEqual(t, result, "b")
 }
 
 func TestIntersection(t *testing.T) {
-	result := Intersection([][]int{{1, 2, 3}, {3, 4, 5}})
+	result := AllIntersection([][]int{{1, 2, 3}, {3, 4, 5}})
 	testlib.AssertArrayEqual(t, result, []int{3})
 }
 
 func TestAnyMatch(t *testing.T) {
-	result := AnyMatch([][]int{{1, 2, 3}, {3, 4, 5}, {2, 6, 7, 8}})
+	result := AnyIntersection([][]int{{1, 2, 3}, {3, 4, 5}, {2, 6, 7, 8}})
 	testlib.AssertArrayEqual(t, result, []int{2, 3})
 }
 

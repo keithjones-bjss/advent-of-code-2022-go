@@ -42,12 +42,12 @@ func Part1Score(rucksack string) int {
 	size := len(rucksack)
 	half := size / 2
 	compartments := []string{rucksack[0:half], rucksack[half:size]}
-	result := aoc_library.StringIntersection(compartments)
+	result := aoc_library.AllStringIntersection(compartments)
 	return Priority(result)
 }
 
 func Part2Score(rucksacks []string) int {
-	result := aoc_library.StringIntersection(rucksacks)
+	result := aoc_library.AllStringIntersection(rucksacks)
 	return Priority(result)
 }
 

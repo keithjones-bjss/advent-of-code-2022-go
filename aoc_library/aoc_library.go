@@ -33,7 +33,7 @@ func DistinctValues[T comparable](array []T) []T {
 	return result
 }
 
-func Intersection[T comparable](arrays [][]T) []T {
+func CommonValues[T comparable](arrays [][]T) map[T]int {
 	commonValues := make(map[T]int)
 	for _, value := range arrays {
 		distinctValues := DistinctValues(value)
@@ -41,28 +41,24 @@ func Intersection[T comparable](arrays [][]T) []T {
 			commonValues[value]++
 		}
 	}
+	return commonValues
+}
+
+func AllIntersection[T comparable](arrays [][]T) []T {
+	commonValues := CommonValues(arrays)
 	filteredValues := MapFilter(commonValues, func(_ T, value int) bool { return value == len(arrays) })
 	return MapKeysToArray(filteredValues)
 }
 
-func AnyMatch[T comparable](arrays [][]T) []T {
-	commonValues := make(map[T]int)
-	for _, value := range arrays {
-		distinctValues := DistinctValues(value)
-		for _, value := range distinctValues {
-			commonValues[value]++
-		}
-	}
+func AnyIntersection[T comparable](arrays [][]T) []T {
+	commonValues := CommonValues(arrays)
 	filteredValues := MapFilter(commonValues, func(_ T, value int) bool { return value > 1 })
 	return MapKeysToArray(filteredValues)
 }
 
-func StringIntersection(strings []string) string {
-	var runeArrays [][]rune
-	for _, value := range strings {
-		runeArrays = append(runeArrays, []rune(value))
-	}
-	result := Intersection(runeArrays)
+func AllStringIntersection(strings []string) string {
+	runeArrays := ArrayTranslate(strings, func(_ int, value string) []rune { return []rune(value) })
+	result := AllIntersection(runeArrays)
 	return string(result)
 }
 

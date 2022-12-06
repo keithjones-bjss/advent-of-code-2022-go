@@ -45,7 +45,7 @@ func FindStartOfMessageMarker(line string, length int) int {
 	for index := length; index <= len(line); index++ {
 		substr := []rune(line[index-length : index])
 		split := aoc_library.ArrayTranslate(substr, func(_ int, element rune) []rune { return []rune{element} })
-		result := aoc_library.AnyMatch(split)
+		result := aoc_library.AnyIntersection(split)
 		if len(result) == 0 {
 			return index
 		}

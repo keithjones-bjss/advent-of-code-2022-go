@@ -44,7 +44,7 @@ func Part1Score(line string) int {
 	for _, intRange := range intRangePair {
 		expandedRanges = append(expandedRanges, ExpandIntRange(intRange))
 	}
-	intersection := aoc_library.Intersection(expandedRanges)
+	intersection := aoc_library.AllIntersection(expandedRanges)
 	sort.Ints(intersection)
 	if aoc_library.ArrayContains(expandedRanges, intersection) {
 		return 1
@@ -58,7 +58,7 @@ func Part2Score(line string) int {
 	for _, intRange := range intRangePair {
 		expandedRanges = append(expandedRanges, ExpandIntRange(intRange))
 	}
-	intersection := aoc_library.Intersection(expandedRanges)
+	intersection := aoc_library.AllIntersection(expandedRanges)
 	if len(intersection) > 0 {
 		return 1
 	}
