@@ -1,7 +1,6 @@
 package day7
 
 import (
-	"advent-of-code-2022/aoc_library"
 	"bufio"
 	"log"
 	"os"
@@ -59,9 +58,9 @@ func ParseTree(root *Directory, cwd *Directory, smallestMatch *Directory, path [
 		childTotal, smallestMatch = ParseTree(root, v, smallestMatch, append(path, v.name))
 		result += childTotal
 	}
-	log.Printf("[%v] /%v: size %v, total %v, children %v", result,
-		strings.Join(path, "/"), cwd.fileSizes, cwd.totalSizes,
-		aoc_library.ArrayTranslate(cwd.children, func(_ int, v *Directory) string { return v.name }))
+	//log.Printf("[%v] /%v: size %v, total %v, children %v", result,
+	//	strings.Join(path, "/"), cwd.fileSizes, cwd.totalSizes,
+	//	aoc_library.ArrayTranslate(cwd.children, func(_ int, v *Directory) string { return v.name }))
 	return result, smallestMatch
 }
 
