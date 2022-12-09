@@ -12,5 +12,10 @@ func TestPart1(t *testing.T) {
 
 func TestPart2(t *testing.T) {
 	_, result := Run("test.txt")
-	testlib.AssertEqual(t, result, 0)
+	testlib.AssertEqual(t, result, 1)
+}
+
+func TestPart2WithLargerGrid(t *testing.T) {
+	_, result := Run("test2.txt")
+	testlib.AssertEqual(t, result, 36)
 }
