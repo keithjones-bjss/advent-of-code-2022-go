@@ -75,7 +75,9 @@ func Hike(grid [][]rune, paths [][]point) int {
 		row := append([]bool{}, falseValues...)
 		visited = append(visited, row)
 	}
-	visited[0][0] = true
+	for _, v := range paths {
+		visited[v[0].y][v[0].x] = true
+	}
 	found := Walk(grid, visited, paths)
 	result := len(found)
 	if result > 0 {
@@ -83,6 +85,7 @@ func Hike(grid [][]rune, paths [][]point) int {
 	}
 	return result
 }
+
 func Walk(grid [][]rune, visited [][]bool, paths [][]point) [][]point {
 	var nextPaths [][]point
 	for _, path := range paths {

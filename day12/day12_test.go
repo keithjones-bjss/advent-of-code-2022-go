@@ -12,5 +12,5 @@ func TestPart1(t *testing.T) {
 
 func TestPart2(t *testing.T) {
 	_, result := Run("test.txt")
-	testlib.AssertEqual(t, result, -1)
+	testlib.AssertEqual(t, result, 29)
 }
