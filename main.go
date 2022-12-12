@@ -4,6 +4,7 @@ import (
 	"advent-of-code-2022/day1"
 	"advent-of-code-2022/day10"
 	"advent-of-code-2022/day11"
+	"advent-of-code-2022/day12"
 	"advent-of-code-2022/day2"
 	"advent-of-code-2022/day3"
 	"advent-of-code-2022/day4"
@@ -83,6 +84,12 @@ func RunDay11() {
 	fmt.Printf("Day 11 Part 2: %v\n", part2)
 }
 
+func RunDay12() {
+	part1, part2 := day12.Run("day12/input.txt")
+	fmt.Printf("Day 12 Part 1: %v\n", part1)
+	fmt.Printf("Day 12 Part 2: %v\n", part2)
+}
+
 func main() {
 	RunDay1()
 	RunDay2()
@@ -95,4 +102,5 @@ func main() {
 	RunDay9()
 	RunDay10()
 	RunDay11()
+	RunDay12()
 }
