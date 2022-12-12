@@ -69,19 +69,19 @@ func Run(filename string) (int, [240]bool) {
 		_ = file.Close()
 	}(file)
 
-	part1 := vm{clock: 0, x: 1}
+	machine := vm{clock: 0, x: 1}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line != "" {
-			part1 = part1.Interpret(line)
+			machine = machine.Interpret(line)
 		}
 	}
 	if err = scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
 
-	return part1.signal, part1.beam
+	return machine.signal, machine.beam
 }
 
 func Stringify(beam [240]bool) string {
