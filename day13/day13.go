@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -144,24 +145,17 @@ func ComparePackets(packetA *Node, packetB *Node) int {
 }
 
 func GetDecoderKey(allPackets []*Node) int {
+	// Add dividers
+	newOrder := append([]*Node{}, allPackets...)
 	root2 := Node{children: []*Node{}}
-	allPackets = append(allPackets, Parse(&root2, "[[2]]"))
+	newOrder = append(newOrder, Parse(&root2, "[[2]]"))
 	root6 := Node{children: []*Node{}}
-	allPackets = append(allPackets, Parse(&root6, "[[6]]"))
+	newOrder = append(newOrder, Parse(&root6, "[[6]]"))
 
 	// Sort packets
-	newOrder := append([]*Node{}, allPackets...)
-	for count := 0; count < len(newOrder); count++ {
-		for index := 0; index < len(newOrder)-count-1; index++ {
-			this := newOrder[index]
-			next := newOrder[index+1]
-			result := ComparePackets(this, next)
-			if result < 0 {
-				newOrder[index] = next
-				newOrder[index+1] = this
-			}
-		}
-	}
+	sort.Slice(newOrder, func(i int, j int) bool {
+		return ComparePackets(newOrder[i], newOrder[j]) >= 0
+	})
 
 	// Calculate decoder key
 	result := 1
