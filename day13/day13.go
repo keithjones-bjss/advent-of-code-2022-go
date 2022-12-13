@@ -24,8 +24,8 @@ func Run(filename string) (int, int) {
 		_ = file.Close()
 	}(file)
 
+	var packetPair []*Node
 	var packets []*Node
-	var allPackets []*Node
 	part1 := 0
 	index := 1
 
@@ -33,31 +33,31 @@ func Run(filename string) (int, int) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" {
-			inOrder := ComparePackets(packets[0], packets[1]) >= 0
+			inOrder := ComparePackets(packetPair[0], packetPair[1]) >= 0
 			if inOrder {
 				part1 += index
 			}
 			index++
-			packets = []*Node{}
+			packetPair = []*Node{}
 		} else {
 			root := Node{children: []*Node{}}
 			Parse(&root, line)
+			packetPair = append(packetPair, &root)
 			packets = append(packets, &root)
-			allPackets = append(allPackets, &root)
 		}
 	}
 	if err = scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
 
-	if len(packets) == 2 {
-		inOrder := ComparePackets(packets[0], packets[1]) >= 0
+	if len(packetPair) == 2 {
+		inOrder := ComparePackets(packetPair[0], packetPair[1]) >= 0
 		if inOrder {
 			part1 += index
 		}
 	}
 
-	part2 := GetDecoderKey(allPackets)
+	part2 := GetDecoderKey(packets)
 
 	return part1, part2
 }
@@ -144,9 +144,9 @@ func ComparePackets(packetA *Node, packetB *Node) int {
 	return -1
 }
 
-func GetDecoderKey(allPackets []*Node) int {
+func GetDecoderKey(packets []*Node) int {
 	// Add dividers
-	newOrder := append([]*Node{}, allPackets...)
+	newOrder := append([]*Node{}, packets...)
 	root2 := Node{children: []*Node{}}
 	newOrder = append(newOrder, Parse(&root2, "[[2]]"))
 	root6 := Node{children: []*Node{}}
