@@ -16,9 +16,10 @@ import (
 	"advent-of-code-2022/day8"
 	"advent-of-code-2022/day9"
 	"fmt"
+	"time"
 )
 
-func RunDay1() {
+func Day1() {
 	top := day1.Top("day1/input.txt")
 	sum := day1.Sum(top)
 
@@ -26,97 +27,107 @@ func RunDay1() {
 	fmt.Printf("Day 1  Part 2: %v\n", sum)
 }
 
-func RunDay2() {
+func Day2() {
 	part1, part2 := day2.Run("day2/input.txt")
 	fmt.Printf("Day 2  Part 1: %v\n", part1)
 	fmt.Printf("Day 2  Part 2: %v\n", part2)
 }
 
-func RunDay3() {
+func Day3() {
 	part1, part2 := day3.Run("day3/input.txt")
 	fmt.Printf("Day 3  Part 1: %v\n", part1)
 	fmt.Printf("Day 3  Part 2: %v\n", part2)
 }
 
-func RunDay4() {
+func Day4() {
 	part1, part2 := day4.Run("day4/input.txt")
 	fmt.Printf("Day 4  Part 1: %v\n", part1)
 	fmt.Printf("Day 4  Part 2: %v\n", part2)
 }
 
-func RunDay5() {
+func Day5() {
 	part1, part2 := day5.Run("day5/input.txt")
 	fmt.Printf("Day 5  Part 1: %v\n", part1)
 	fmt.Printf("Day 5  Part 2: %v\n", part2)
 }
 
-func RunDay6() {
+func Day6() {
 	part1, part2 := day6.Run("day6/input.txt")
 	fmt.Printf("Day 6  Part 1: %v\n", part1)
 	fmt.Printf("Day 6  Part 2: %v\n", part2)
 }
 
-func RunDay7() {
+func Day7() {
 	part1, part2 := day7.Run("day7/input.txt")
 	fmt.Printf("Day 7  Part 1: %v\n", part1)
 	fmt.Printf("Day 7  Part 2: %v\n", part2)
 }
 
-func RunDay8() {
+func Day8() {
 	part1, part2 := day8.Run("day8/input.txt")
 	fmt.Printf("Day 8  Part 1: %v\n", part1)
 	fmt.Printf("Day 8  Part 2: %v\n", part2)
 }
 
-func RunDay9() {
+func Day9() {
 	part1, part2 := day9.Run("day9/input.txt")
 	fmt.Printf("Day 9  Part 1: %v\n", part1)
 	fmt.Printf("Day 9  Part 2: %v\n", part2)
 }
 
-func RunDay10() {
+func Day10() {
 	part1, part2 := day10.Run("day10/input.txt")
 	fmt.Printf("Day 10 Part 1: %v\n", part1)
 	fmt.Printf("Day 10 Part 2\n%v\n", day10.Stringify(part2))
 }
 
-func RunDay11() {
+func Day11() {
 	part1, part2 := day11.Run("day11/input.txt")
 	fmt.Printf("Day 11 Part 1: %v\n", part1)
 	fmt.Printf("Day 11 Part 2: %v\n", part2)
 }
 
-func RunDay12() {
+func Day12() {
 	part1, part2 := day12.Run("day12/input.txt")
 	fmt.Printf("Day 12 Part 1: %v\n", part1)
 	fmt.Printf("Day 12 Part 2: %v\n", part2)
 }
 
-func RunDay13() {
+func Day13() {
 	part1, part2 := day13.Run("day13/input.txt")
 	fmt.Printf("Day 13 Part 1: %v\n", part1)
 	fmt.Printf("Day 13 Part 2: %v\n", part2)
 }
 
-func RunDay14() {
+func Day14() {
 	part1, part2 := day14.Run("day14/input.txt")
 	fmt.Printf("Day 14 Part 1: %v\n", part1)
 	fmt.Printf("Day 14 Part 2: %v\n", part2)
 }
 
+func RunTimed(function func()) {
+	started := time.Now()
+	function()
+	elapsed := time.Since(started)
+	fmt.Printf("Completed in %v\n", elapsed)
+}
+
 func main() {
-	RunDay1()
-	RunDay2()
-	RunDay3()
-	RunDay4()
-	RunDay5()
-	RunDay6()
-	RunDay7()
-	RunDay8()
-	RunDay9()
-	RunDay10()
-	RunDay11()
-	RunDay12()
-	RunDay13()
-	RunDay14()
+	started := time.Now()
+	RunTimed(Day1)
+	RunTimed(Day2)
+	RunTimed(Day3)
+	RunTimed(Day4)
+	RunTimed(Day5)
+	RunTimed(Day6)
+	RunTimed(Day7)
+	RunTimed(Day8)
+	RunTimed(Day9)
+	RunTimed(Day10)
+	RunTimed(Day11)
+	RunTimed(Day12)
+	RunTimed(Day13)
+	RunTimed(Day14)
+	elapsed := time.Since(started)
+	fmt.Printf("Completed all days in %v\n", elapsed)
 }
