@@ -122,14 +122,14 @@ func GetMaxY(walls []aoc_library.Point) int {
 	return maxY
 }
 
-func Flow(grain aoc_library.Point, filled map[aoc_library.Point]bool, maxY int) aoc_library.Point {
-	next := grain.Move("D")
-	if IsBlocked(next, filled) {
-		next = grain.Move("D+L")
-		if IsBlocked(next, filled) {
-			next = grain.Move("D+R")
-			if IsBlocked(next, filled) {
-				return grain
+func Flow(point aoc_library.Point, filled map[aoc_library.Point]bool, maxY int) aoc_library.Point {
+	next := aoc_library.Point{X: point.X, Y: point.Y + 1}
+	if filled[next] {
+		next.X--
+		if filled[next] {
+			next.X = point.X + 1
+			if filled[next] {
+				return point
 			}
 		}
 	}
@@ -137,9 +137,4 @@ func Flow(grain aoc_library.Point, filled map[aoc_library.Point]bool, maxY int) 
 		return next
 	}
 	return Flow(next, filled, maxY)
-}
-
-func IsBlocked(point aoc_library.Point, filled map[aoc_library.Point]bool) bool {
-	_, ok := filled[point]
-	return ok
 }
