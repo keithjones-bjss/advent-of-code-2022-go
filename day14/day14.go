@@ -37,35 +37,37 @@ func Run(filename string) (int, int) {
 
 	maxY := GetMaxY(walls)
 
-	start := aoc_library.Point{X: 500, Y: 0}
-
 	// Part 1
-	filled := MakeMap(walls)
+	filled := MakeMap(walls, maxY)
 	for part1 = 0; ; part1++ {
-		grain := Flow(start, filled, maxY)
-		if grain.Y > maxY {
+		x, y := Flow(maxY+1, 0, filled, maxY)
+		if y > maxY {
 			break
 		}
-		filled[grain] = true
+		filled[y][x] = 'o'
 	}
 
 	// Part 2
-	filled = MakeMap(walls)
+	filled = MakeMap(walls, maxY)
 	for part2 = 0; ; part2++ {
-		grain := Flow(start, filled, maxY)
-		if grain.Y == 0 {
+		x, y := Flow(maxY+1, 0, filled, maxY)
+		if y == 0 {
 			break
 		}
-		filled[grain] = true
+		filled[y][x] = 'o'
 	}
 
 	return part1, part2 + 1
 }
 
-func MakeMap(walls []aoc_library.Point) map[aoc_library.Point]bool {
-	filled := make(map[aoc_library.Point]bool)
+func MakeMap(walls []aoc_library.Point, maxY int) [][]rune {
+	var filled [][]rune
+	row := strings.Repeat(".", maxY*2+3)
+	for count := 0; count <= maxY+1; count++ {
+		filled = append(filled, []rune(row))
+	}
 	for _, v := range walls {
-		filled[v] = true
+		filled[v.Y][v.X+maxY-499] = '#'
 	}
 	return filled
 }
@@ -122,19 +124,20 @@ func GetMaxY(walls []aoc_library.Point) int {
 	return maxY
 }
 
-func Flow(point aoc_library.Point, filled map[aoc_library.Point]bool, maxY int) aoc_library.Point {
-	next := aoc_library.Point{X: point.X, Y: point.Y + 1}
-	if filled[next] {
-		next.X--
-		if filled[next] {
-			next.X = point.X + 1
-			if filled[next] {
-				return point
+func Flow(lastX int, lastY int, filled [][]rune, maxY int) (int, int) {
+	x := lastX
+	y := lastY + 1
+	if filled[y][x] != '.' {
+		x--
+		if filled[y][x] != '.' {
+			x += 2
+			if filled[y][x] != '.' {
+				return lastX, lastY
 			}
 		}
 	}
-	if next.Y > maxY {
-		return next
+	if y > maxY {
+		return x, y
 	}
-	return Flow(next, filled, maxY)
+	return Flow(x, y, filled, maxY)
 }
