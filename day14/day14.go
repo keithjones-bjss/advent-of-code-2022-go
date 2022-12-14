@@ -21,13 +21,14 @@ func Run(filename string) (int, int) {
 	part1 := 0
 	part2 := 0
 
-	var walls [][]aoc_library.Point
+	var walls []aoc_library.Point
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line != "" {
-			walls = append(walls, Parse(line))
+			points := Parse(line)
+			walls = append(walls, Explode(points)...)
 		}
 	}
 	if err = scanner.Err(); err != nil {
@@ -39,26 +40,34 @@ func Run(filename string) (int, int) {
 	start := aoc_library.Point{X: 500, Y: 0}
 
 	// Part 1
-	var sand []aoc_library.Point
+	filled := MakeMap(walls)
 	for part1 = 0; ; part1++ {
-		grain := Flow(start, walls, sand, maxY)
+		grain := Flow(start, filled, maxY)
 		if grain.Y > maxY {
 			break
 		}
-		sand = append(sand, grain)
+		filled[grain] = true
 	}
 
 	// Part 2
-	var sand2 []aoc_library.Point
+	filled = MakeMap(walls)
 	for part2 = 0; ; part2++ {
-		grain := Flow(start, walls, sand2, maxY)
+		grain := Flow(start, filled, maxY)
 		if grain.Y == 0 {
 			break
 		}
-		sand2 = append(sand2, grain)
+		filled[grain] = true
 	}
 
 	return part1, part2 + 1
+}
+
+func MakeMap(walls []aoc_library.Point) map[aoc_library.Point]bool {
+	filled := make(map[aoc_library.Point]bool)
+	for _, v := range walls {
+		filled[v] = true
+	}
+	return filled
 }
 
 func Parse(line string) []aoc_library.Point {
@@ -74,30 +83,52 @@ func Parse(line string) []aoc_library.Point {
 	return points
 }
 
-func GetMaxY(walls [][]aoc_library.Point) int {
-	maxY := 0
-	for _, v := range walls {
-		for _, p := range v {
-			if maxY < p.Y {
-				maxY = p.Y
+func Explode(points []aoc_library.Point) []aoc_library.Point {
+	var exploded []aoc_library.Point
+	var last aoc_library.Point
+	for i, p := range points {
+		if i != 0 {
+			if last.X < p.X {
+				for x := last.X; x < p.X; x++ {
+					exploded = append(exploded, aoc_library.Point{X: x, Y: p.Y})
+				}
+			} else if last.X > p.X {
+				for x := last.X; x > p.X; x-- {
+					exploded = append(exploded, aoc_library.Point{X: x, Y: p.Y})
+				}
+			} else if last.Y < p.Y {
+				for y := last.Y; y < p.Y; y++ {
+					exploded = append(exploded, aoc_library.Point{X: p.X, Y: y})
+				}
+			} else if last.Y > p.Y {
+				for y := last.Y; y > p.Y; y-- {
+					exploded = append(exploded, aoc_library.Point{X: p.X, Y: y})
+				}
 			}
+		}
+		last = p
+	}
+	exploded = append(exploded, last)
+	return exploded
+}
+
+func GetMaxY(walls []aoc_library.Point) int {
+	maxY := 0
+	for _, p := range walls {
+		if maxY < p.Y {
+			maxY = p.Y
 		}
 	}
 	return maxY
 }
 
-func Flow(
-	grain aoc_library.Point,
-	walls [][]aoc_library.Point,
-	sand []aoc_library.Point,
-	maxY int,
-) aoc_library.Point {
+func Flow(grain aoc_library.Point, filled map[aoc_library.Point]bool, maxY int) aoc_library.Point {
 	next := grain.Move("D")
-	if IsBlocked(next, walls, sand) {
+	if IsBlocked(next, filled) {
 		next = grain.Move("D+L")
-		if IsBlocked(next, walls, sand) {
+		if IsBlocked(next, filled) {
 			next = grain.Move("D+R")
-			if IsBlocked(next, walls, sand) {
+			if IsBlocked(next, filled) {
 				return grain
 			}
 		}
@@ -105,25 +136,10 @@ func Flow(
 	if next.Y > maxY {
 		return next
 	}
-	return Flow(next, walls, sand, maxY)
+	return Flow(next, filled, maxY)
 }
 
-func IsBlocked(point aoc_library.Point, walls [][]aoc_library.Point, sand []aoc_library.Point) bool {
-	for _, v := range walls {
-		var last aoc_library.Point
-		for i, next := range v {
-			if i != 0 {
-				if point.IsBetween(last, next) {
-					return true
-				}
-			}
-			last = next
-		}
-	}
-	for _, grain := range sand {
-		if point.X == grain.X && point.Y == grain.Y {
-			return true
-		}
-	}
-	return false
+func IsBlocked(point aoc_library.Point, filled map[aoc_library.Point]bool) bool {
+	_, ok := filled[point]
+	return ok
 }
