@@ -7,6 +7,7 @@ import (
 	"advent-of-code-2022/day12"
 	"advent-of-code-2022/day13"
 	"advent-of-code-2022/day14"
+	"advent-of-code-2022/day15"
 	"advent-of-code-2022/day2"
 	"advent-of-code-2022/day3"
 	"advent-of-code-2022/day4"
@@ -105,6 +106,12 @@ func Day14() {
 	fmt.Printf("Day 14 Part 2: %v\n", part2)
 }
 
+func Day15() {
+	part1, part2 := day15.Run("day15/input.txt")
+	fmt.Printf("Day 15 Part 1: %v\n", part1)
+	fmt.Printf("Day 15 Part 2: %v\n", part2)
+}
+
 func RunTimed(function func()) {
 	started := time.Now()
 	function()
@@ -128,6 +135,7 @@ func main() {
 	RunTimed(Day12)
 	RunTimed(Day13)
 	RunTimed(Day14)
+	RunTimed(Day15)
 	elapsed := time.Since(started)
 	fmt.Printf("Completed all days in %v\n", elapsed)
 }

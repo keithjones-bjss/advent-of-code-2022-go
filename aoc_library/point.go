@@ -22,9 +22,20 @@ func (p Point) IsBetween(p1 Point, p2 Point) bool {
 	return IsBetween(p.X, p1.X, p2.X) && IsBetween(p.Y, p1.Y, p2.Y)
 }
 
+func (p Point) DistanceFrom(q Point) int {
+	return Abs(p.X-q.X) + Abs(p.Y-q.Y)
+}
+
 func IsBetween(i int, i1 int, i2 int) bool {
 	if i1 <= i2 {
 		return i >= i1 && i <= i2
 	}
 	return i >= i2 && i <= i1
+}
+
+func Abs(i int) int {
+	if i < 0 {
+		return -i
+	}
+	return i
 }
