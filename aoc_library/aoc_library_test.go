@@ -2,6 +2,7 @@ package aoc_library
 
 import (
 	"advent-of-code-2022/testlib"
+	"sort"
 	"testing"
 )
 
@@ -39,6 +40,7 @@ func TestIntersection(t *testing.T) {
 
 func TestAnyMatch(t *testing.T) {
 	result := AnyIntersection([][]int{{1, 2, 3}, {3, 4, 5}, {2, 6, 7, 8}})
+	sort.Ints(result)
 	testlib.AssertArrayEqual(t, result, []int{2, 3})
 }
 
