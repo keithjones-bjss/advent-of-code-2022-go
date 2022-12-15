@@ -1,9 +1,9 @@
 package day10
 
 import (
+	"advent-of-code-2022/aoc_library"
 	"bufio"
 	"log"
-	"math"
 	"os"
 	"strconv"
 )
@@ -44,7 +44,7 @@ func (machine vm) WithBeam(old vm) vm {
 	for cycle := old.clock; cycle < machine.clock; cycle++ {
 		position := cycle % 240
 		horizontal := position % 40
-		beam[position] = math.Abs(float64(old.x-horizontal)) <= 1
+		beam[position] = aoc_library.Abs(old.x-horizontal) <= 1
 	}
 	return vm{clock: machine.clock, x: machine.x, signal: machine.signal, beam: beam}
 }

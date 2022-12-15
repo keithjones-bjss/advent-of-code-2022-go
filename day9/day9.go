@@ -1,9 +1,9 @@
 package day9
 
 import (
+	"advent-of-code-2022/aoc_library"
 	"bufio"
 	"log"
-	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -21,10 +21,10 @@ type area struct {
 }
 
 var directions = map[string]point{
-	"U": point{0, 1},
-	"D": point{0, -1},
-	"L": point{-1, 0},
-	"R": point{1, 0},
+	"U": {0, 1},
+	"D": {0, -1},
+	"L": {-1, 0},
+	"R": {1, 0},
 }
 
 func (p point) Move(dir string) point {
@@ -32,25 +32,15 @@ func (p point) Move(dir string) point {
 }
 
 func (p point) IsTouching(other point) bool {
-	return math.Abs(float64(other.x-p.x)) <= 1 && math.Abs(float64(other.y-p.y)) <= 1
-}
-
-func Sign(value int) int {
-	if value < 0 {
-		return -1
-	}
-	if value > 0 {
-		return 1
-	}
-	return 0
+	return aoc_library.Abs(other.x-p.x) <= 1 && aoc_library.Abs(other.y-p.y) <= 1
 }
 
 func (p point) MoveTowards(other point) point {
 	if p.IsTouching(other) {
 		return p
 	}
-	p.x += Sign(other.x - p.x)
-	p.y += Sign(other.y - p.y)
+	p.x += aoc_library.Sign(other.x - p.x)
+	p.y += aoc_library.Sign(other.y - p.y)
 	return p
 }
 
