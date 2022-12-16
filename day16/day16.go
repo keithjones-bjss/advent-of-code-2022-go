@@ -9,15 +9,10 @@ import (
 	"strings"
 )
 
-type Link struct {
-	node     string
-	distance int
-}
-
 type Node struct {
 	flowRate int
 	valves   []string
-	links    []Link
+	links    map[string]int
 }
 
 func Run(filename string) (int, int) {
@@ -45,26 +40,13 @@ func Run(filename string) (int, int) {
 	}
 
 	nodes = CollapseNodes(start, nodes)
+	CalculatePaths(nodes)
 
-	var path1 = Walk(nodes, State{
-		currentNode: []string{start, start},
-		trail:       [][]string{{start}, {start}},
-		activeNodes: []string{},
-		moves:       []int{30, 0},
-	})
-	log.Printf("%v", path1)
-	part1 := path1.total
-
-	//var path2 = Walk(nodes, State{
-	//	currentNode: []string{start, start},
-	//	trail:       [][]string{{start}, {start}},
-	//	activeNodes: []string{},
-	//	moves:       []int{26, 26},
-	//})
-	//log.Printf("%v", path2)
-	//part2 := path2.total
-	part2 := 0
-
+	visited := make(map[string]bool)
+	visited[start] = true
+	part1 := Walk1(&nodes, visited, start, 30, 0)
+	part2 := Walk2(&nodes, visited, start, 26, start, 26, 0, []string{})
+	//part2 := 0
 	return part1, part2
 }
 
@@ -77,6 +59,7 @@ func Parse(line string) (string, Node) {
 		index = strings.Index(line, "valve") + 6
 	}
 	result.valves = strings.Split(line[index:], ", ")
+	result.links = make(map[string]int)
 	return nodeId, result
 }
 
@@ -98,7 +81,7 @@ func CollapseNodes(start string, nodes map[string]Node) map[string]Node {
 					}
 				}
 				if next != id && (next == start || nodes[next].flowRate != 0) {
-					node.links = append(node.links, Link{next, distance})
+					node.links[next] = distance
 				}
 			}
 			collapsedNodes[id] = node
@@ -107,74 +90,99 @@ func CollapseNodes(start string, nodes map[string]Node) map[string]Node {
 	return collapsedNodes
 }
 
-func Walk(nodes map[string]Node, state State) State {
-	// If all valves are open, stop...
-	if len(state.activeNodes) == len(nodes)-1 {
-		return state
-	}
-	// Play out all possible move combinations
-	nextState := state
-	for index, moves := range state.moves {
-		if moves > 0 {
-			currentNode := state.currentNode[index]
-			// Options: (1) activate current node
-			if nodes[currentNode].flowRate != 0 && !aoc_library.Contains(state.activeNodes, currentNode) {
-				possibleState := state.OpenValve(nodes[currentNode].flowRate, index)
-				possibleState = Walk(nodes, possibleState)
-				if nextState.total < possibleState.total {
-					nextState = possibleState
-				}
-			}
-			// Options: (2) Move elsewhere
-			for _, link := range nodes[currentNode].links {
-				if link.distance <= state.moves[index] && !aoc_library.Contains(state.trail[index], link.node) {
-					possibleState := state.MoveTo(link, index)
-					possibleState = Walk(nodes, possibleState)
-					if nextState.total < possibleState.total {
-						nextState = possibleState
+func CalculatePaths(nodes map[string]Node) {
+	for nodeId, node := range nodes {
+		for len(node.links) < len(nodes)-1 {
+			for linkNodeId, linkDistance := range node.links {
+				linkNode := nodes[linkNodeId]
+				for onwardNodeId, onwardDistance := range linkNode.links {
+					if onwardNodeId != nodeId {
+						currentDistance, ok := node.links[onwardNodeId]
+						if !ok || currentDistance > linkDistance+onwardDistance {
+							node.links[onwardNodeId] = linkDistance + onwardDistance
+						}
 					}
 				}
 			}
 		}
 	}
-	return nextState
 }
 
-type State struct {
-	currentNode []string
-	trail       [][]string
-	moves       []int
-	activeNodes []string
-	total       int
-}
-
-func (state State) MoveTo(link Link, index int) State {
-	nodes := append([]string{}, state.currentNode...)
-	nodes[1-index] = state.currentNode[1-index]
-	nodes[index] = link.node
-	trail := append([][]string{}, append([]string{}, state.trail[0]...), append([]string{}, state.trail[1]...))
-	trail[index] = append(trail[index], link.node)
-	moves := append([]int{}, state.moves...)
-	moves[index] = state.moves[index] - link.distance
-	return State{
-		currentNode: nodes,
-		trail:       trail,
-		activeNodes: state.activeNodes,
-		total:       state.total,
-		moves:       moves,
+func Walk1(nodes *map[string]Node, visited map[string]bool, here string, moves int, total int) int {
+	bestTotal := total
+	for next, distance := range (*nodes)[here].links {
+		if visited[next] {
+			continue
+		}
+		movesLeft := moves - distance - 1
+		if movesLeft > 0 {
+			newTotal := total + movesLeft*(*nodes)[next].flowRate
+			copyVisited := make(map[string]bool)
+			for k := range visited {
+				copyVisited[k] = true
+			}
+			copyVisited[next] = true
+			newTotal = Walk1(nodes, copyVisited, next, movesLeft, newTotal)
+			if bestTotal < newTotal {
+				bestTotal = newTotal
+			}
+		}
 	}
+	return bestTotal
 }
 
-func (state State) OpenValve(flowRate int, index int) State {
-	moves := append([]int{}, state.moves...)
-	moves[index] = state.moves[index] - 1
-	trail := append([][]string{}, append([]string{}, state.trail[0]...), append([]string{}, state.trail[1]...))
-	trail[index] = append([]string{}, state.currentNode[index])
-	return State{
-		currentNode: state.currentNode,
-		trail:       trail,
-		activeNodes: append(state.activeNodes, state.currentNode[index]),
-		total:       state.total + flowRate*(state.moves[index]-1),
-		moves:       moves,
+func Walk2(
+	nodes *map[string]Node,
+	visited map[string]bool,
+	here1 string,
+	moves1 int,
+	here2 string,
+	moves2 int,
+	total int,
+	history []string,
+) int {
+	bestTotal := total
+	for next, distance := range (*nodes)[here1].links {
+		if visited[next] {
+			continue
+		}
+		movesLeft := moves1 - distance - 1
+		if movesLeft > 0 && (*nodes)[next].flowRate > 0 {
+			if len(history) == 1 {
+				log.Printf("%v I:%v\n", history[0], next)
+			}
+			newTotal := total + movesLeft*(*nodes)[next].flowRate
+			copyVisited := make(map[string]bool)
+			for k := range visited {
+				copyVisited[k] = true
+			}
+			copyVisited[next] = true
+			newTotal = Walk2(nodes, copyVisited, next, movesLeft, here2, moves2, newTotal, append(history, "I:"+next))
+			if bestTotal < newTotal {
+				bestTotal = newTotal
+			}
+		}
 	}
+	for next, distance := range (*nodes)[here2].links {
+		if visited[next] {
+			continue
+		}
+		movesLeft := moves2 - distance - 1
+		if movesLeft > 0 && (*nodes)[next].flowRate > 0 {
+			if len(history) == 1 {
+				log.Printf("%v E:%v\n", history[0], next)
+			}
+			newTotal := total + movesLeft*(*nodes)[next].flowRate
+			copyVisited := make(map[string]bool)
+			for k := range visited {
+				copyVisited[k] = true
+			}
+			copyVisited[next] = true
+			newTotal = Walk2(nodes, copyVisited, here1, moves1, next, movesLeft, newTotal, append(history, "E:"+next))
+			if bestTotal < newTotal {
+				bestTotal = newTotal
+			}
+		}
+	}
+	return bestTotal
 }
