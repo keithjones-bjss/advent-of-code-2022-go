@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -13,6 +14,11 @@ type Node struct {
 	flowRate int
 	valves   []string
 	links    map[string]int
+}
+
+type IndexedNode struct {
+	flowRate int
+	links    []int
 }
 
 func Run(filename string) (int, int) {
@@ -42,11 +48,14 @@ func Run(filename string) (int, int) {
 	nodes = CollapseNodes(start, nodes)
 	CalculatePaths(nodes)
 
-	visited := make(map[string]bool)
-	visited[start] = true
-	part1 := Walk1(&nodes, visited, start, 30, 0)
-	part2 := Walk2(&nodes, visited, start, 26, start, 26, 0, []string{})
-	//part2 := 0
+	indexedNodes := IndexNodes(nodes)
+	var visitedIndex []bool
+	for i := 0; i < len(indexedNodes); i++ {
+		visitedIndex = append(visitedIndex, false)
+	}
+	part1 := Walk1(&indexedNodes, &visitedIndex, 0, 30, 0)
+	part2 := Walk2(&indexedNodes, &visitedIndex, 0, 26, 0, 26, 0)
+
 	return part1, part2
 }
 
@@ -69,12 +78,12 @@ func CollapseNodes(start string, nodes map[string]Node) map[string]Node {
 		if id == start || node.flowRate != 0 {
 			for _, v := range node.valves {
 				distance := 1
-				var prev []string
+				prev := []string{id}
 				next := v
 				for next != start && nodes[next].flowRate == 0 && !aoc_library.Contains(prev, next) {
 					prev = append(prev, next)
 					for _, x := range nodes[next].valves {
-						if !aoc_library.Contains(prev, x) && x != id {
+						if !aoc_library.Contains(prev, x) {
 							next = x
 							distance++
 						}
@@ -108,21 +117,43 @@ func CalculatePaths(nodes map[string]Node) {
 	}
 }
 
-func Walk1(nodes *map[string]Node, visited map[string]bool, here string, moves int, total int) int {
+func IndexNodes(nodes map[string]Node) []IndexedNode {
+	var nodeIds []string
+	for nodeId := range nodes {
+		nodeIds = append(nodeIds, nodeId)
+	}
+	sort.Strings(nodeIds)
+	var nodeIndexes = make(map[string]int)
+	for index, nodeId := range nodeIds {
+		nodeIndexes[nodeId] = index
+	}
+	var indexedNodes []IndexedNode
+	for _, nodeId := range nodeIds {
+		var links []int
+		for _, linkNodeId := range nodeIds {
+			distance := nodes[nodeId].links[linkNodeId]
+			links = append(links, distance)
+		}
+		indexedNodes = append(indexedNodes, IndexedNode{
+			flowRate: nodes[nodeId].flowRate,
+			links:    links,
+		})
+	}
+	return indexedNodes
+}
+
+func Walk1(nodes *[]IndexedNode, visited *[]bool, here int, moves int, total int) int {
 	bestTotal := total
 	for next, distance := range (*nodes)[here].links {
-		if visited[next] {
+		if (*visited)[next] {
 			continue
 		}
 		movesLeft := moves - distance - 1
 		if movesLeft > 0 {
 			newTotal := total + movesLeft*(*nodes)[next].flowRate
-			copyVisited := make(map[string]bool)
-			for k := range visited {
-				copyVisited[k] = true
-			}
-			copyVisited[next] = true
-			newTotal = Walk1(nodes, copyVisited, next, movesLeft, newTotal)
+			(*visited)[next] = true
+			newTotal = Walk1(nodes, visited, next, movesLeft, newTotal)
+			(*visited)[next] = false
 			if bestTotal < newTotal {
 				bestTotal = newTotal
 			}
@@ -132,53 +163,56 @@ func Walk1(nodes *map[string]Node, visited map[string]bool, here string, moves i
 }
 
 func Walk2(
-	nodes *map[string]Node,
-	visited map[string]bool,
-	here1 string,
+	nodes *[]IndexedNode,
+	visited *[]bool,
+	here1 int,
 	moves1 int,
-	here2 string,
+	here2 int,
 	moves2 int,
 	total int,
-	history []string,
 ) int {
 	bestTotal := total
-	for next, distance := range (*nodes)[here1].links {
-		if visited[next] {
-			continue
-		}
-		movesLeft := moves1 - distance - 1
-		if movesLeft > 0 && (*nodes)[next].flowRate > 0 {
-			if len(history) == 1 {
-				log.Printf("%v I:%v\n", history[0], next)
-			}
-			newTotal := total + movesLeft*(*nodes)[next].flowRate
-			copyVisited := make(map[string]bool)
-			for k := range visited {
-				copyVisited[k] = true
-			}
-			copyVisited[next] = true
-			newTotal = Walk2(nodes, copyVisited, next, movesLeft, here2, moves2, newTotal, append(history, "I:"+next))
-			if bestTotal < newTotal {
-				bestTotal = newTotal
-			}
-		}
+	if here1 == here2 && moves1 == moves2 {
+		bestTotal = IndexedMove(nodes, visited, here1, moves1, here2, moves2, total, bestTotal)
+	} else if moves1 > moves2 {
+		bestTotal = IndexedMove(nodes, visited, here1, moves1, here2, moves2, total, bestTotal)
+		bestTotal = IndexedMove(nodes, visited, here2, moves2, here1, moves1, total, bestTotal)
+	} else {
+		bestTotal = IndexedMove(nodes, visited, here2, moves2, here1, moves1, total, bestTotal)
+		bestTotal = IndexedMove(nodes, visited, here1, moves1, here2, moves2, total, bestTotal)
 	}
-	for next, distance := range (*nodes)[here2].links {
-		if visited[next] {
+	return bestTotal
+}
+
+func IndexedMove(
+	nodes *[]IndexedNode,
+	visited *[]bool,
+	myNode int,
+	myMovesLeft int,
+	otherNode int,
+	otherMovesLeft int,
+	total int,
+	bestTotal int,
+) int {
+	for next, distance := range (*nodes)[myNode].links {
+		if (*visited)[next] || distance == 0 {
 			continue
 		}
-		movesLeft := moves2 - distance - 1
-		if movesLeft > 0 && (*nodes)[next].flowRate > 0 {
-			if len(history) == 1 {
-				log.Printf("%v E:%v\n", history[0], next)
-			}
-			newTotal := total + movesLeft*(*nodes)[next].flowRate
-			copyVisited := make(map[string]bool)
-			for k := range visited {
-				copyVisited[k] = true
-			}
-			copyVisited[next] = true
-			newTotal = Walk2(nodes, copyVisited, here1, moves1, next, movesLeft, newTotal, append(history, "E:"+next))
+		flowRate := (*nodes)[next].flowRate
+		movesLeft := myMovesLeft - distance - 1
+		if movesLeft > 0 && flowRate > 0 {
+			newTotal := total + flowRate*movesLeft
+			(*visited)[next] = true
+			newTotal = Walk2(
+				nodes,
+				visited,
+				next,
+				movesLeft,
+				otherNode,
+				otherMovesLeft,
+				newTotal,
+			)
+			(*visited)[next] = false
 			if bestTotal < newTotal {
 				bestTotal = newTotal
 			}
