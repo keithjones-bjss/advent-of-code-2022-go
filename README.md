@@ -12,12 +12,12 @@ go test ./...
 
 To run all days, excluding the expensive parts:
 ```shell
-go run main.go
+go run aoc2022.go
 ```
 
 To run with command line options:
 ```shell
-go build main.go
-./main --help
-./main --days=1-10,17 --include-all
+go build aoc2022.go
+./aoc2022 --help
+./aoc2022 --days=1-10,17 --include-all
 ```

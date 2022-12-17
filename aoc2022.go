@@ -21,7 +21,6 @@ import (
 	"advent-of-code-2022/day9"
 	"flag"
 	"fmt"
-	"log"
 	"reflect"
 	"runtime"
 	"strings"
@@ -162,7 +161,6 @@ func GetDays(s string) []int {
 			}
 		}
 	}
-	log.Printf("%v", days)
 	return days
 }
 
@@ -195,7 +193,8 @@ func main() {
 	flag.Parse()
 
 	started := time.Now()
-	RunTimed(*all, DaysToRun(GetDays(*days)))
+	daysToRun := DaysToRun(GetDays(*days))
+	RunTimed(*all, daysToRun)
 	elapsed := time.Since(started)
-	fmt.Printf("Completed all days in %v\n", elapsed)
+	fmt.Printf("Completed %v days in %v\n", len(daysToRun), elapsed)
 }
