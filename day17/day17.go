@@ -36,6 +36,13 @@ func Run(filename string) (int, int) {
 		log.Fatal(err)
 	}
 
+	part1 := SolveTower(jets, 2022)
+	part2 := SolveTower(jets, 1000000000000)
+
+	return part1, part2
+}
+
+func GenerateBlocks() [][][]rune {
 	var blocks [][][]rune
 	for i := range blockStrings {
 		var block [][]rune
@@ -44,19 +51,23 @@ func Run(filename string) (int, int) {
 		}
 		blocks = append(blocks, block)
 	}
-
-	part1 := SolveTower(blocks, jets, 2022)
-	//part2 := SolveTower(blocks, jets, 1000000000000)
-	part2 := 0
-
-	return part1, part2
+	return blocks
 }
 
-func SolveTower(blocks [][][]rune, jets string, rocks int) int {
+type TowerHistory struct {
+	height  int
+	count   int
+	jet     int
+	looping bool
+}
+
+func SolveTower(jets string, rocks int) int {
+	var towerHistory []TowerHistory
 	var tower [][]rune
 	height := 0
+	addedHeight := 0
 	jetCount := 0
-	debug := false
+	blocks := GenerateBlocks()
 	for count := 0; count < rocks; count++ {
 		x := 2
 		y := height + 3
@@ -87,30 +98,48 @@ func SolveTower(blocks [][][]rune, jets string, rocks int) int {
 					if y+dy < height {
 						for dx := 0; dx < len(block[dy]); dx++ {
 							if block[dy][dx] != '.' {
-								if debug {
-									log.Printf("%v,%v -> %v,%v", dy, dx, y+dy, x+dx)
-								}
 								tower[y+dy][x+dx] = '#'
 							}
 						}
 					}
 				}
+				// Iteration detection
+				currentState := TowerHistory{
+					len(tower),
+					count % len(blocks),
+					jetCount % len(jets),
+					false,
+				}
+				lastLoop := -1
+				for i, v := range towerHistory {
+					if v.count == currentState.count && v.jet == currentState.jet {
+						currentState.looping = true
+						lastLoop = i
+					}
+				}
+				currentPosition := len(towerHistory)
+				towerHistory = append(towerHistory, currentState)
+				iterationSize := currentPosition - lastLoop
+				previousIteration := lastLoop - iterationSize
+				if previousIteration >= 0 {
+					heightDifference := currentState.height - towerHistory[lastLoop].height
+					previousIterationMatches := towerHistory[previousIteration].count == currentState.count && towerHistory[previousIteration].jet == currentState.jet
+					heightsMatch := heightDifference == towerHistory[lastLoop].height-towerHistory[previousIteration].height
+					if previousIterationMatches && heightsMatch {
+						if rocks-count >= iterationSize {
+							// Simulate further complete iterations
+							remainingIterations := (rocks - count) / iterationSize
+							addedRocks := iterationSize * remainingIterations
+							addedHeight = heightDifference * remainingIterations
+							count += addedRocks
+						}
+					}
+				}
 			}
-			if debug {
-				log.Printf("%v-%v,%v-%v %v %v-%v,%v-%v [%v]",
-					ox, ox+w-1, oy, oy+len(block)-1, string(jet), x, x+w-1, y, y+len(block)-1, rest)
-			}
-		}
-		if debug {
-			for idx := len(tower) - 1; idx >= 0; idx-- {
-				log.Printf("|%v|", string(tower[idx]))
-			}
-			log.Printf("+-------+")
-			log.Printf("")
 		}
 	}
 
-	return len(tower)
+	return len(tower) + addedHeight
 }
 
 func MoveBlockSideways(jet uint8, x int, w int) int {
