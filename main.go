@@ -19,6 +19,7 @@ import (
 	"advent-of-code-2022/day8"
 	"advent-of-code-2022/day9"
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -114,8 +115,14 @@ func Day15() {
 	fmt.Printf("Day 15 Part 2: %v\n", part2)
 }
 
+func Day16Part1() {
+	part1, _ := day16.Run("day16/input.txt", true)
+	fmt.Printf("Day 16 Part 1: %v\n", part1)
+	fmt.Print("Day 16 Part 2: (skipped due to excessive processing time)\n")
+}
+
 func Day16() {
-	part1, part2 := day16.Run("day16/input.txt")
+	part1, part2 := day16.Run("day16/input.txt", false)
 	fmt.Printf("Day 16 Part 1: %v\n", part1)
 	fmt.Printf("Day 16 Part 2: %v\n", part2)
 }
@@ -132,8 +139,6 @@ func RunTimed(function func()) {
 	elapsed := time.Since(started)
 	fmt.Printf("Completed in %v\n", elapsed)
 }
-
-var skipDay16 = true
 
 func main() {
 	started := time.Now()
@@ -152,10 +157,10 @@ func main() {
 	RunTimed(Day13)
 	RunTimed(Day14)
 	RunTimed(Day15)
-	if skipDay16 {
-		fmt.Print("Day 16: ** SKIPPED **\n")
-	} else {
+	if os.Getenv("GITHUB_ACTION") == "" {
 		RunTimed(Day16)
+	} else {
+		RunTimed(Day16Part1)
 	}
 	RunTimed(Day17)
 	elapsed := time.Since(started)

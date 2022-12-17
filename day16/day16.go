@@ -21,7 +21,7 @@ type IndexedNode struct {
 	links    []int
 }
 
-func Run(filename string) (int, int) {
+func Run(filename string, skipPart2 bool) (int, int) {
 	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatalf("Can't open %v: %v", filename, err)
@@ -54,9 +54,12 @@ func Run(filename string) (int, int) {
 		visitedIndex = append(visitedIndex, false)
 	}
 	part1 := Walk1(&indexedNodes, &visitedIndex, 0, 30, 0)
-	part2 := Walk2(&indexedNodes, &visitedIndex, 0, 26, 0, 26, 0)
-
-	return part1, part2
+	if skipPart2 {
+		return part1, 0
+	} else {
+		part2 := Walk2(&indexedNodes, &visitedIndex, 0, 26, 0, 26, 0)
+		return part1, part2
+	}
 }
 
 func Parse(line string) (string, Node) {
