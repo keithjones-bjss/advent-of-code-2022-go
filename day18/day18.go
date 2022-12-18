@@ -124,26 +124,27 @@ func FillOutsideArea(size Point3D, grid [][][]bool) {
 }
 
 func FillPoint(size Point3D, grid [][][]bool, x int, y int, z int) {
-	if !grid[x][y][z] {
-		grid[x][y][z] = true
-		if x > 0 && !grid[x-1][y][z] {
-			FillPoint(size, grid, x-1, y, z)
-		}
-		if x < size.X-1 && !grid[x+1][y][z] {
-			FillPoint(size, grid, x+1, y, z)
-		}
-		if y > 0 && !grid[x][y-1][z] {
-			FillPoint(size, grid, x, y-1, z)
-		}
-		if y < size.Y-1 && !grid[x][y+1][z] {
-			FillPoint(size, grid, x, y+1, z)
-		}
-		if z > 0 && !grid[x][y][z-1] {
-			FillPoint(size, grid, x, y, z-1)
-		}
-		if z < size.Z-1 && !grid[x][y][z+1] {
-			FillPoint(size, grid, x, y, z+1)
-		}
+	if grid[x][y][z] {
+		return
+	}
+	grid[x][y][z] = true
+	if x > 0 && !grid[x-1][y][z] {
+		FillPoint(size, grid, x-1, y, z)
+	}
+	if x < size.X-1 && !grid[x+1][y][z] {
+		FillPoint(size, grid, x+1, y, z)
+	}
+	if y > 0 && !grid[x][y-1][z] {
+		FillPoint(size, grid, x, y-1, z)
+	}
+	if y < size.Y-1 && !grid[x][y+1][z] {
+		FillPoint(size, grid, x, y+1, z)
+	}
+	if z > 0 && !grid[x][y][z-1] {
+		FillPoint(size, grid, x, y, z-1)
+	}
+	if z < size.Z-1 && !grid[x][y][z+1] {
+		FillPoint(size, grid, x, y, z+1)
 	}
 }
 
