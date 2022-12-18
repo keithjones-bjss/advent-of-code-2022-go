@@ -98,7 +98,7 @@ func CalculateSurfaceArea(size Point3D, grid [][][]bool) int {
 		for y := 0; y < size.Y; y++ {
 			for z := 0; z < size.Z; z++ {
 				if grid[x][y][z] {
-					area += ExposedFaces(x, grid, y, z, size)
+					area += ExposedFaces(size, grid, x, y, z)
 				}
 			}
 		}
@@ -147,7 +147,7 @@ func FillPoint(size Point3D, grid [][][]bool, x int, y int, z int) {
 	}
 }
 
-func ExposedFaces(x int, grid [][][]bool, y int, z int, size Point3D) int {
+func ExposedFaces(size Point3D, grid [][][]bool, x int, y int, z int) int {
 	count := 0
 	if x == 0 || !grid[x-1][y][z] {
 		count++
