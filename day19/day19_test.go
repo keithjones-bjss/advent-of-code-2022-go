@@ -34,21 +34,22 @@ func TestWalk24(t *testing.T) {
 	testlib.AssertEqual(t, result, 9)
 }
 
-func TestWalk32(t *testing.T) {
-	blueprint := Blueprint{
-		id:            1,
-		ore:           4,
-		clay:          2,
-		obsidianOre:   3,
-		obsidianClay:  14,
-		geodeOre:      2,
-		geodeObsidian: 7,
-	}
-	result := Walk(32, blueprint, [][][]int{{{1, 0}, {0, 0}, {0, 0}, {0, 0}}})
-	testlib.AssertEqual(t, result, 56)
-}
+// Commented out due to excessive processing time
+//func TestWalk32(t *testing.T) {
+//	blueprint := Blueprint{
+//		id:            1,
+//		ore:           4,
+//		clay:          2,
+//		obsidianOre:   3,
+//		obsidianClay:  14,
+//		geodeOre:      2,
+//		geodeObsidian: 7,
+//	}
+//	result := Walk(32, blueprint, [][][]int{{{1, 0}, {0, 0}, {0, 0}, {0, 0}}})
+//	testlib.AssertEqual(t, result, 56)
+//}
 
 func TestPart1(t *testing.T) {
-	result, _ := Run("test.txt")
+	result, _ := Run("test.txt", true)
 	testlib.AssertEqual(t, result, 33)
 }
