@@ -42,7 +42,6 @@ func Run(filename string) (int, int) {
 	}
 
 	size := Point3D{max.X - min.X + 1, max.Y - min.Y + 1, max.Z - min.Z + 1}
-	log.Printf("min %d,%d,%d max %d,%d,%d size %dx%dx%d", min.X, min.Y, min.Z, max.X, max.Y, max.Z, size.X, size.Y, size.Z)
 
 	grid := InitializeGrid(size)
 	PopulateGrid(points, grid, min)
