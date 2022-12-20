@@ -14,6 +14,7 @@ import (
 	"advent-of-code-2022/day18"
 	"advent-of-code-2022/day19"
 	"advent-of-code-2022/day2"
+	"advent-of-code-2022/day20"
 	"advent-of-code-2022/day3"
 	"advent-of-code-2022/day4"
 	"advent-of-code-2022/day5"
@@ -153,6 +154,12 @@ func Day19(all bool) {
 	}
 }
 
+func Day20(_ bool) {
+	part1, part2 := day20.Run("day20/input.txt")
+	fmt.Printf("Day 20 Part 1: %v\n", part1)
+	fmt.Printf("Day 20 Part 2: %v\n", part2)
+}
+
 func RunTimed(all bool, days []func(bool)) {
 	for _, function := range days {
 		started := time.Now()
@@ -189,7 +196,7 @@ func GetFunctionName(i interface{}) string {
 func DaysToRun(days []int) []func(bool) {
 	allDays := []func(bool){
 		Day1, Day2, Day3, Day4, Day5, Day6, Day7, Day8, Day9, Day10, Day11, Day12, Day13,
-		Day14, Day15, Day16, Day17, Day18, Day19,
+		Day14, Day15, Day16, Day17, Day18, Day19, Day20,
 	}
 	if len(days) == 0 {
 		return allDays
