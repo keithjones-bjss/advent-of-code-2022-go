@@ -56,51 +56,53 @@ func Mix(numbers []int, times int) []int {
 	nextNumbers := append([]Mixable{}, aoc_library.ArrayTranslate(numbers, func(i int, v int) Mixable {
 		return Mixable{v, i, v == 0}
 	})...)
-	for count := 0; count < size; count++ {
-		index := Find(nextNumbers, func(_ int, value Mixable) bool { return value.initialPosition == count })
-		value := nextNumbers[index].value
-		newPosition := index + value
-		if newPosition <= 0 && value < 0 {
-			//log.Printf("%d %d >>>", value, newPosition)
-			newPosition += (size - 1) * (-newPosition / size)
-			for newPosition <= 0 && value < 0 {
-				newPosition += size - 1
+	for iteration := 1; iteration <= times; iteration++ {
+		for count := 0; count < size; count++ {
+			index := Find(nextNumbers, func(_ int, value Mixable) bool { return value.initialPosition == count })
+			value := nextNumbers[index].value
+			newPosition := index + value
+			if newPosition <= 0 && value < 0 {
+				//log.Printf("%d %d >>>", value, newPosition)
+				newPosition += (size - 1) * (-newPosition / size)
+				for newPosition <= 0 && value < 0 {
+					newPosition += size - 1
+				}
 			}
+			if newPosition >= size && value > 0 {
+				//log.Printf("%d %d <<<", value, newPosition)
+				newPosition += (1 - size) * (newPosition / size)
+				for newPosition >= size && value > 0 {
+					newPosition += 1 - size
+				}
+			}
+			//log.Printf("Moving %d from position %d to position %d.", value, index, newPosition)
+			var slice []Mixable
+			if newPosition < index {
+				//log.Printf("Moving backwards %d places", index-newPosition)
+				slice = append(slice, nextNumbers[:newPosition]...)
+				//log.Printf("Slice left of new position: %v", slice)
+				slice = append(slice, nextNumbers[index])
+				slice = append(slice, nextNumbers[newPosition:index]...)
+				//log.Printf("Slice up to index: %v", slice)
+				if index < size {
+					slice = append(slice, nextNumbers[index+1:]...)
+				}
+			} else {
+				//log.Printf("Moving forwards %d places", newPosition-index)
+				if index > 0 {
+					slice = append(slice, nextNumbers[:index]...)
+					//log.Printf("Slice left of value: %v", slice)
+				}
+				slice = append(slice, nextNumbers[index+1:newPosition+1]...)
+				//log.Printf("Slice up to new position: %v", slice)
+				slice = append(slice, nextNumbers[index])
+				if newPosition+1 < size {
+					slice = append(slice, nextNumbers[newPosition+1:]...)
+				}
+			}
+			//log.Printf("%v -> %v", nextNumbers, slice)
+			nextNumbers = slice
 		}
-		if newPosition >= size && value > 0 {
-			//log.Printf("%d %d <<<", value, newPosition)
-			newPosition += (1 - size) * (newPosition / size)
-			for newPosition >= size && value > 0 {
-				newPosition += 1 - size
-			}
-		}
-		//log.Printf("Moving %d from position %d to position %d.", value, index, newPosition)
-		var slice []Mixable
-		if newPosition < index {
-			//log.Printf("Moving backwards %d places", index-newPosition)
-			slice = append(slice, nextNumbers[:newPosition]...)
-			//log.Printf("Slice left of new position: %v", slice)
-			slice = append(slice, nextNumbers[index])
-			slice = append(slice, nextNumbers[newPosition:index]...)
-			//log.Printf("Slice up to index: %v", slice)
-			if index < size {
-				slice = append(slice, nextNumbers[index+1:]...)
-			}
-		} else {
-			//log.Printf("Moving forwards %d places", newPosition-index)
-			if index > 0 {
-				slice = append(slice, nextNumbers[:index]...)
-				//log.Printf("Slice left of value: %v", slice)
-			}
-			slice = append(slice, nextNumbers[index+1:newPosition+1]...)
-			//log.Printf("Slice up to new position: %v", slice)
-			slice = append(slice, nextNumbers[index])
-			if newPosition+1 < size {
-				slice = append(slice, nextNumbers[newPosition+1:]...)
-			}
-		}
-		//log.Printf("%v -> %v", nextNumbers, slice)
-		nextNumbers = slice
 	}
 	return aoc_library.ArrayTranslate(nextNumbers, func(_ int, v Mixable) int {
 		return v.value
