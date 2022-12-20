@@ -48,13 +48,12 @@ func Run(filename string) (int, int) {
 type Mixable struct {
 	value           int
 	initialPosition int
-	done            bool
 }
 
 func Mix(numbers []int, times int) []int {
 	size := len(numbers)
 	nextNumbers := append([]Mixable{}, aoc_library.ArrayTranslate(numbers, func(i int, v int) Mixable {
-		return Mixable{v, i, v == 0}
+		return Mixable{v, i}
 	})...)
 	for iteration := 1; iteration <= times; iteration++ {
 		for count := 0; count < size; count++ {
