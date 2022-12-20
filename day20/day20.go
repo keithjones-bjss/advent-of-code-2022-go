@@ -35,12 +35,12 @@ func Run(filename string) (int, int) {
 	}
 
 	mixed1 := Mix(numbers1, 1)
-	zero1 := IndexOf(mixed1, 0)
-	part1 := ValueAt(mixed1, zero1+1000) + ValueAt(mixed1, zero1+2000) + ValueAt(mixed1, zero1+3000)
+	zero1 := aoc_library.IndexOf(mixed1, 0)
+	part1 := aoc_library.ValueAt(mixed1, zero1+1000) + aoc_library.ValueAt(mixed1, zero1+2000) + aoc_library.ValueAt(mixed1, zero1+3000)
 
 	mixed2 := Mix(numbers2, 10)
-	zero2 := IndexOf(mixed2, 0)
-	part2 := ValueAt(mixed2, zero2+1000) + ValueAt(mixed2, zero2+2000) + ValueAt(mixed2, zero2+3000)
+	zero2 := aoc_library.IndexOf(mixed2, 0)
+	part2 := aoc_library.ValueAt(mixed2, zero2+1000) + aoc_library.ValueAt(mixed2, zero2+2000) + aoc_library.ValueAt(mixed2, zero2+3000)
 
 	return part1, part2
 }
@@ -58,21 +58,19 @@ func Mix(numbers []int, times int) []int {
 	})...)
 	for iteration := 1; iteration <= times; iteration++ {
 		for count := 0; count < size; count++ {
-			index := Find(nextNumbers, func(_ int, value Mixable) bool { return value.initialPosition == count })
+			index := aoc_library.Find(nextNumbers, func(_ int, value Mixable) bool { return value.initialPosition == count })
 			value := nextNumbers[index].value
 			newPosition := index + value
 			if newPosition <= 0 && value < 0 {
-				//log.Printf("%d %d >>>", value, newPosition)
-				newPosition += (size - 1) * (-newPosition / size)
-				for newPosition <= 0 && value < 0 {
-					newPosition += size - 1
+				newPosition += (size - 1) * (1 - (value / (size - 1)))
+				if newPosition >= size {
+					newPosition -= size - 1
 				}
 			}
 			if newPosition >= size && value > 0 {
-				//log.Printf("%d %d <<<", value, newPosition)
-				newPosition += (1 - size) * (newPosition / size)
-				for newPosition >= size && value > 0 {
-					newPosition += 1 - size
+				newPosition -= (size - 1) * (1 + (value / (size - 1)))
+				if newPosition < 0 {
+					newPosition += size - 1
 				}
 			}
 			//log.Printf("Moving %d from position %d to position %d.", value, index, newPosition)
@@ -107,23 +105,4 @@ func Mix(numbers []int, times int) []int {
 	return aoc_library.ArrayTranslate(nextNumbers, func(_ int, v Mixable) int {
 		return v.value
 	})
-}
-
-type FilterFunction[T comparable, U any] func(index T, value U) bool
-
-func IndexOf[T comparable](array []T, value T) int {
-	return Find(array, func(_ int, v T) bool { return v == value })
-}
-
-func Find[T comparable](array []T, function FilterFunction[int, T]) int {
-	for index, value := range array {
-		if function(index, value) {
-			return index
-		}
-	}
-	return -1
-}
-
-func ValueAt[T comparable](array []T, index int) T {
-	return array[index%len(array)]
 }

@@ -91,6 +91,19 @@ func TestArrayTranslate(t *testing.T) {
 	testlib.AssertArrayEqual(t, result[2], []int{3})
 }
 
+func TestIndexOf(t *testing.T) {
+	numbers := []int{1, 2, -3, 4, 0, 3, -2}
+	result := IndexOf(numbers, 0)
+	testlib.AssertEqual(t, result, 4)
+}
+
+func TestValueAt(t *testing.T) {
+	numbers := []int{1, 2, -3, 4, 0, 3, -2}
+	testlib.AssertEqual(t, ValueAt(numbers, 1004), 4)
+	testlib.AssertEqual(t, ValueAt(numbers, 2004), -3)
+	testlib.AssertEqual(t, ValueAt(numbers, 3004), 2)
+}
+
 func TestMaxWithRhsLarger(t *testing.T) {
 	result := Max(2, 3)
 	testlib.AssertEqual(t, result, 3)

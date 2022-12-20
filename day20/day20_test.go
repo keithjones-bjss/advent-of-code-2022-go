@@ -42,19 +42,6 @@ func TestMixTwiceWithKey(t *testing.T) {
 	testlib.AssertEqual(t, result[6], 811589153)
 }
 
-func TestIndexOf(t *testing.T) {
-	numbers := []int{1, 2, -3, 4, 0, 3, -2}
-	result := IndexOf(numbers, 0)
-	testlib.AssertEqual(t, result, 4)
-}
-
-func TestValueAt(t *testing.T) {
-	numbers := []int{1, 2, -3, 4, 0, 3, -2}
-	testlib.AssertEqual(t, ValueAt(numbers, 1004), 4)
-	testlib.AssertEqual(t, ValueAt(numbers, 2004), -3)
-	testlib.AssertEqual(t, ValueAt(numbers, 3004), 2)
-}
-
 func TestPart1(t *testing.T) {
 	result, _ := Run("test.txt")
 	testlib.AssertEqual(t, result, 3)

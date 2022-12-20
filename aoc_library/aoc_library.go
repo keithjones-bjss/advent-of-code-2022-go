@@ -102,6 +102,25 @@ func ArrayTranslate[T any, U any](array []T, function TranslateFunction[T, U]) [
 	return newArray
 }
 
+type FilterFunction[T comparable, U any] func(index T, value U) bool
+
+func IndexOf[T comparable](array []T, value T) int {
+	return Find(array, func(_ int, v T) bool { return v == value })
+}
+
+func Find[T comparable](array []T, function FilterFunction[int, T]) int {
+	for index, value := range array {
+		if function(index, value) {
+			return index
+		}
+	}
+	return -1
+}
+
+func ValueAt[T comparable](array []T, index int) T {
+	return array[index%len(array)]
+}
+
 func Min(a int, b int) int {
 	if a < b {
 		return a
