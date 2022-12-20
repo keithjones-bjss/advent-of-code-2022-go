@@ -62,16 +62,10 @@ func Mix(numbers []int, times int) []int {
 			value := nextNumbers[index].value
 			newPosition := index + value
 			if newPosition <= 0 && value < 0 {
-				newPosition += (size - 1) * (1 - (value / (size - 1)))
-				if newPosition >= size {
-					newPosition -= size - 1
-				}
+				newPosition += (size - 1) * (1 - (newPosition / (size - 1)))
 			}
 			if newPosition >= size && value > 0 {
-				newPosition -= (size - 1) * (1 + (value / (size - 1)))
-				if newPosition < 0 {
-					newPosition += size - 1
-				}
+				newPosition -= (size - 1) * (newPosition / (size - 1))
 			}
 			//log.Printf("Moving %d from position %d to position %d.", value, index, newPosition)
 			var slice []Mixable
