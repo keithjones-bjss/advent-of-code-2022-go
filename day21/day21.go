@@ -118,7 +118,7 @@ func Part2(expressions map[string]Expression) int {
 		target, _ = Evaluate(expressions, expressions["root"].lhs)
 		expressionName = root.rhs
 	}
-	log.Printf("Target value is %v", target)
+	//log.Printf("Target value is %v", target)
 	result := target
 	for expressionName != "humn" {
 		expression, _ := expressions[expressionName]
