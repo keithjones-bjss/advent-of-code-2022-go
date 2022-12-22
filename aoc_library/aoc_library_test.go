@@ -163,3 +163,13 @@ func TestSignWithZero(t *testing.T) {
 	result := Sign(0)
 	testlib.AssertEqual(t, result, 0)
 }
+
+func TestModWithPositiveNumber(t *testing.T) {
+	result := Mod(11, 7)
+	testlib.AssertEqual(t, result, 4)
+}
+
+func TestModWithNegativeNumber(t *testing.T) {
+	result := Mod(-11, 7)
+	testlib.AssertEqual(t, result, 3)
+}

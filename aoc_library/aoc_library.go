@@ -151,3 +151,10 @@ func Sign(value int) int {
 	}
 	return 0
 }
+
+func Mod(dividend int, divisor int) int {
+	if dividend < 0 {
+		return (divisor + (dividend % divisor)) % divisor
+	}
+	return dividend % divisor
+}
