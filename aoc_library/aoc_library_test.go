@@ -92,9 +92,15 @@ func TestArrayTranslate(t *testing.T) {
 }
 
 func TestIndexOf(t *testing.T) {
-	numbers := []int{1, 2, -3, 4, 0, 3, -2}
+	numbers := []int{1, 2, -3, 4, 0, 3, 0, -2}
 	result := IndexOf(numbers, 0)
 	testlib.AssertEqual(t, result, 4)
+}
+
+func TestLastIndexOf(t *testing.T) {
+	numbers := []int{1, 2, -3, 4, 0, 3, 0, -2}
+	result := LastIndexOf(numbers, 0)
+	testlib.AssertEqual(t, result, 6)
 }
 
 func TestValueAt(t *testing.T) {

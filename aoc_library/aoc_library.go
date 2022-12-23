@@ -108,8 +108,22 @@ func IndexOf[T comparable](array []T, value T) int {
 	return Find(array, func(_ int, v T) bool { return v == value })
 }
 
+func LastIndexOf[T comparable](array []T, value T) int {
+	return FindReverse(array, func(_ int, v T) bool { return v == value })
+}
+
 func Find[T comparable](array []T, function FilterFunction[int, T]) int {
 	for index, value := range array {
+		if function(index, value) {
+			return index
+		}
+	}
+	return -1
+}
+
+func FindReverse[T comparable](array []T, function FilterFunction[int, T]) int {
+	for index := len(array) - 1; index >= 0; index-- {
+		value := array[index]
 		if function(index, value) {
 			return index
 		}
