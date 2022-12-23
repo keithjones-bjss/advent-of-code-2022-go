@@ -257,8 +257,8 @@ func FindCube(grid [][]rune) Cube {
 		faces[v.id].right = Transform(orderedFaces, transforms[aoc_library.Mod(1+orientation, 4)], orientation)
 		faces[v.id].below = Transform(orderedFaces, transforms[aoc_library.Mod(2+orientation, 4)], orientation)
 		faces[v.id].left = Transform(orderedFaces, transforms[aoc_library.Mod(3+orientation, 4)], orientation)
-		log.Printf("Face %v (index %v) rotate %v: %v,%v A:%v B:%v L:%v R:%v",
-			v.id, i, v.orientation, v.row, v.column, faces[v.id].above, faces[v.id].below, faces[v.id].left, faces[v.id].right)
+		//log.Printf("Face %v (index %v) rotate %v: %v,%v A:%v B:%v L:%v R:%v",
+		//	v.id, i, v.orientation, v.row, v.column, faces[v.id].above, faces[v.id].below, faces[v.id].left, faces[v.id].right)
 	}
 
 	return Cube{width, height, faceSize, faceGrid, faces}
@@ -345,34 +345,34 @@ func MoveByCubeFace(grid [][]rune, cube Cube, originalPosition Position, dx int,
 		case Right:
 			transform = face.right
 		}
-		log.Printf("Moving from (%d,%d) on face %d to (%d,%d) [%d:%d,%d:%d] on face %v via transform %v, facing %d",
-			position.row, position.column, face.id,
-			nextRow, nextColumn, faceGridRow, faceRow, faceGridColumn, faceColumn, transform.id, transform.matrix, position.facing)
+		//log.Printf("Moving from (%d,%d) on face %d to (%d,%d) [%d:%d,%d:%d] on face %v via transform %v, facing %d",
+		//	position.row, position.column, face.id,
+		//	nextRow, nextColumn, faceGridRow, faceRow, faceGridColumn, faceColumn, transform.id, transform.matrix, position.facing)
 		switch transform.matrix {
 		case Move:
 			nextRow = faceRow
 			nextColumn = faceColumn
-			log.Printf("Moving: row %v col %v", nextRow, nextColumn)
+			//log.Printf("Moving: row %v col %v", nextRow, nextColumn)
 		case RotateLeft:
 			nextRow = faceColumn
 			nextColumn = cube.faceSize - 1 - faceRow
-			log.Printf("Left: row %v col %v", nextRow, nextColumn)
+			//log.Printf("Left: row %v col %v", nextRow, nextColumn)
 		case RotateRight:
 			nextRow = cube.faceSize - 1 - faceColumn
 			nextColumn = faceRow
-			log.Printf("Right: row %v col %v", nextRow, nextColumn)
+			//log.Printf("Right: row %v col %v", nextRow, nextColumn)
 		case Flip:
 			nextRow = cube.faceSize - 1 - faceRow
 			nextColumn = cube.faceSize - 1 - faceColumn
-			log.Printf("Flip: row %v col %v", nextRow, nextColumn)
+			//log.Printf("Flip: row %v col %v", nextRow, nextColumn)
 		}
 		faceGridRow = cube.faces[transform.id].row
 		faceGridColumn = cube.faces[transform.id].column
 		position.facing = aoc_library.Mod(position.facing-transform.matrix, 4)
 		nextRow += faceGridRow * cube.faceSize
 		nextColumn += faceGridColumn * cube.faceSize
-		log.Printf("Actually moved to (%d,%d) [%d:%d,%d:%d], now facing %d",
-			nextRow, nextColumn, faceGridRow, faceRow, faceGridColumn, faceColumn, position.facing)
+		//log.Printf("Actually moved to (%d,%d) [%d:%d,%d:%d], now facing %d",
+		//	nextRow, nextColumn, faceGridRow, faceRow, faceGridColumn, faceColumn, position.facing)
 	}
 	position.row = nextRow
 	position.column = nextColumn
