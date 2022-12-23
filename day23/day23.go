@@ -83,7 +83,6 @@ func Run(filename string) (int, int) {
 		}
 		if elvesMoved == 0 {
 			part2 = round + 1
-			break
 		}
 	}
 
