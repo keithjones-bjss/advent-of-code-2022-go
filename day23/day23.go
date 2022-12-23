@@ -77,14 +77,14 @@ func Run(filename string) (int, int) {
 	part2 := 0
 	for round := 0; part2 == 0; round++ {
 		nextGrid, emptySpaces, elvesMoved := Move(grid, round)
-		if round == 10 {
+		grid = nextGrid
+		if round == 9 {
 			part1 = emptySpaces
 		}
 		if elvesMoved == 0 {
 			part2 = round + 1
 			break
 		}
-		grid = nextGrid
 	}
 
 	return part1, part2
@@ -107,67 +107,21 @@ func Move(grid [][]rune, round int) ([][]rune, int, int) {
 	// Generate empty grid and locate elves
 	height := len(grid)
 	width := len(grid[0])
-	elves, nextGrid := PrepareMove(grid, width, height, nextGrid)
+	elves, nextGrid := PrepareMoves(grid, width, height, nextGrid)
 	// Propose moves
 	proposedMoves := make(map[aoc_library.Point]int)
 	for i, elf := range elves {
-		next := aoc_library.Point{X: elf.pos.X + 1, Y: elf.pos.Y + 1}
-		var emptySpaces []bool
-		allEmpty := true
-		for _, dir := range directions {
-			isEmpty := IsEmptySpace(grid, width, height, elf.pos, dir.move)
-			allEmpty = allEmpty && isEmpty
-			emptySpaces = append(emptySpaces, isEmpty)
-		}
-		if !allEmpty {
-			//found := false
-			for count := 0; count <= 3; count++ {
-				dirIndex := directionMap[directionOrder[(count+round)%4]]
-				dir := directions[dirIndex]
-				left := aoc_library.Mod(dirIndex-1, 8)
-				right := aoc_library.Mod(dirIndex+1, 8)
-				if emptySpaces[dirIndex] && emptySpaces[left] && emptySpaces[right] {
-					next.Y += dir.move.Y
-					next.X += dir.move.X
-					//elves[i].dirIndex = (count + elf.dirIndex) % 4
-					//log.Printf("Elf at row %v col %v proposes to move %v.", elf.pos.Y, elf.pos.X, string(dir.dir))
-					//found = true
-					break
-					//} else {
-					//	log.Printf("Elf at row %v col %v can't move %v.", elf.pos.Y, elf.pos.X, string(dir.dir))
-				}
-			}
-			//if !found {
-			//	log.Printf("Elf at row %v col %v cannot move in any cardinal direction.", elf.pos.Y, elf.pos.X)
-			//}
-			//} else {
-			//	log.Printf("Elf at row %v col %v is alone, so chooses not to move.", elf.pos.Y, elf.pos.X)
-		}
-		//elves[i].dirIndex++
+		next := ProposeMove(grid, round, width, height, elf)
 		elves[i].next = next
 		proposedMoves[next]++
 		//log.Printf("Proposed move %v -> %v count %v", elf.pos, next, proposedMoves[next])
 	}
-	// Attempt move
-	elvesMoved := 0
-	for _, elf := range elves {
-		if proposedMoves[elf.next] <= 1 {
-			nextGrid[elf.next.Y][elf.next.X] = '#'
-			if elf.next.X != elf.pos.X+1 || elf.next.Y != elf.pos.Y+1 {
-				elvesMoved++
-			}
-			//log.Printf("Actual move %v -> %v", elf.pos, elf.next)
-		} else {
-			nextGrid[elf.pos.Y+1][elf.pos.X+1] = '#'
-			//log.Printf("Actual move %v -> {%v %v}", elf.pos, elf.pos.X+1, elf.pos.Y+1)
-		}
-	}
-	// Trim grid if possible
-	result := Trim(nextGrid)
+	// Perform all moves
+	result, elvesMoved := PerformMoves(nextGrid, elves, proposedMoves)
 	return result, (len(result) * len(result[0])) - len(elves), elvesMoved
 }
 
-func PrepareMove(grid [][]rune, width int, height int, nextGrid [][]rune) ([]Elf, [][]rune) {
+func PrepareMoves(grid [][]rune, width int, height int, nextGrid [][]rune) ([]Elf, [][]rune) {
 	emptyRow := strings.Repeat(".", width+2)
 	var elves []Elf
 	for row := 0; row < height+2; row++ {
@@ -186,6 +140,65 @@ func PrepareMove(grid [][]rune, width int, height int, nextGrid [][]rune) ([]Elf
 		}
 	}
 	return elves, nextGrid
+}
+
+func ProposeMove(grid [][]rune, round int, width int, height int, elf Elf) aoc_library.Point {
+	// Check elf's surroundings
+	var emptySpaces []bool
+	allEmpty := true
+	for _, dir := range directions {
+		isEmpty := IsEmptySpace(grid, width, height, elf.pos, dir.move)
+		allEmpty = allEmpty && isEmpty
+		emptySpaces = append(emptySpaces, isEmpty)
+	}
+	next := aoc_library.Point{X: elf.pos.X + 1, Y: elf.pos.Y + 1}
+	if allEmpty {
+		return next
+	}
+	// Propose elf's move
+	//found := false
+	for count := 0; count <= 3; count++ {
+		dirIndex := directionMap[directionOrder[(count+round)%4]]
+		dir := directions[dirIndex]
+		left := aoc_library.Mod(dirIndex-1, 8)
+		right := aoc_library.Mod(dirIndex+1, 8)
+		if emptySpaces[dirIndex] && emptySpaces[left] && emptySpaces[right] {
+			next.Y += dir.move.Y
+			next.X += dir.move.X
+			//elves[i].dirIndex = (count + elf.dirIndex) % 4
+			//log.Printf("Elf at row %v col %v proposes to move %v.", elf.pos.Y, elf.pos.X, string(dir.dir))
+			//found = true
+			break
+			//} else {
+			//	log.Printf("Elf at row %v col %v can't move %v.", elf.pos.Y, elf.pos.X, string(dir.dir))
+		}
+	}
+	//if !found {
+	//	log.Printf("Elf at row %v col %v cannot move in any cardinal direction.", elf.pos.Y, elf.pos.X)
+	//}
+	//} else {
+	//	log.Printf("Elf at row %v col %v is alone, so chooses not to move.", elf.pos.Y, elf.pos.X)
+	return next
+}
+
+func PerformMoves(nextGrid [][]rune, elves []Elf, proposedMoves map[aoc_library.Point]int) ([][]rune, int) {
+	// Attempt moves
+	elvesMoved := 0
+	for _, elf := range elves {
+		if proposedMoves[elf.next] <= 1 {
+			nextGrid[elf.next.Y][elf.next.X] = '#'
+			if elf.next.X != elf.pos.X+1 || elf.next.Y != elf.pos.Y+1 {
+				elvesMoved++
+			}
+			//log.Printf("Actual move %v -> %v", elf.pos, elf.next)
+		} else {
+			nextGrid[elf.pos.Y+1][elf.pos.X+1] = '#'
+			//log.Printf("Actual move %v -> {%v %v}", elf.pos, elf.pos.X+1, elf.pos.Y+1)
+		}
+	}
+	// Trim grid if possible
+	result := Trim(nextGrid)
+	return result, elvesMoved
 }
 
 func IsEmptySpace(grid [][]rune, width int, height int, point aoc_library.Point, dir aoc_library.Point) bool {
