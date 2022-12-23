@@ -73,12 +73,19 @@ func Run(filename string) (int, int) {
 	}
 
 	// Ten moves
-	emptySpaces := 0
-	for round := 0; round < 10; round++ {
-		grid, emptySpaces = Move(grid, round)
-	}
-	part1 := emptySpaces
+	part1 := 0
 	part2 := 0
+	for round := 0; part2 == 0; round++ {
+		nextGrid, emptySpaces, elvesMoved := Move(grid, round)
+		if round == 10 {
+			part1 = emptySpaces
+		}
+		if elvesMoved == 0 {
+			part2 = round + 1
+			break
+		}
+		grid = nextGrid
+	}
 
 	return part1, part2
 }
@@ -95,7 +102,7 @@ func MakeDirectionMap() {
 	directionMap[NorthWest] = 7
 }
 
-func Move(grid [][]rune, round int) ([][]rune, int) {
+func Move(grid [][]rune, round int) ([][]rune, int, int) {
 	var nextGrid [][]rune
 	// Generate empty grid and locate elves
 	height := len(grid)
@@ -142,9 +149,13 @@ func Move(grid [][]rune, round int) ([][]rune, int) {
 		//log.Printf("Proposed move %v -> %v count %v", elf.pos, next, proposedMoves[next])
 	}
 	// Attempt move
+	elvesMoved := 0
 	for _, elf := range elves {
 		if proposedMoves[elf.next] <= 1 {
 			nextGrid[elf.next.Y][elf.next.X] = '#'
+			if elf.next.X != elf.pos.X+1 || elf.next.Y != elf.pos.Y+1 {
+				elvesMoved++
+			}
 			//log.Printf("Actual move %v -> %v", elf.pos, elf.next)
 		} else {
 			nextGrid[elf.pos.Y+1][elf.pos.X+1] = '#'
@@ -153,7 +164,7 @@ func Move(grid [][]rune, round int) ([][]rune, int) {
 	}
 	// Trim grid if possible
 	result := Trim(nextGrid)
-	return result, (len(result) * len(result[0])) - len(elves)
+	return result, (len(result) * len(result[0])) - len(elves), elvesMoved
 }
 
 func PrepareMove(grid [][]rune, width int, height int, nextGrid [][]rune) ([]Elf, [][]rune) {

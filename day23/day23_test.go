@@ -13,7 +13,7 @@ func TestMove(t *testing.T) {
 		[]rune(".##"),
 	}
 	MakeDirectionMap()
-	result, emptySpaces := Move(grid, 0)
+	result, emptySpaces, _ := Move(grid, 0)
 	testlib.AssertEqual(t, emptySpaces, 5)
 	testlib.AssertEqual(t, string(result[0]), "##")
 	testlib.AssertEqual(t, string(result[1]), "..")
@@ -31,10 +31,10 @@ func TestMoveFour(t *testing.T) {
 	}
 	emptySpaces := 0
 	MakeDirectionMap()
-	result, _ := Move(grid, 0)
-	result, emptySpaces = Move(result, 1)
-	result, emptySpaces = Move(result, 2)
-	result, emptySpaces = Move(result, 3)
+	result, _, _ := Move(grid, 0)
+	result, emptySpaces, _ = Move(result, 1)
+	result, emptySpaces, _ = Move(result, 2)
+	result, emptySpaces, _ = Move(result, 3)
 	testlib.AssertEqual(t, emptySpaces, 25)
 	testlib.AssertEqual(t, string(result[0]), "..#..")
 	testlib.AssertEqual(t, string(result[1]), "....#")
@@ -51,5 +51,5 @@ func TestPart1(t *testing.T) {
 
 func TestPart2(t *testing.T) {
 	_, result := Run("test.txt")
-	testlib.AssertEqual(t, result, 0)
+	testlib.AssertEqual(t, result, 20)
 }
