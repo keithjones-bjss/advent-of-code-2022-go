@@ -30,26 +30,26 @@ func Run(filename string) (int, int) {
 		log.Fatal(err)
 	}
 
-	initialState := InitialState(grid)
-	stateMap := make(map[aoc_library.Point]State)
-	stateMap[initialState.expedition] = initialState
-	state2, moves := Move(stateMap, 0)
+	area, blizzards := ParseGrid(grid)
+	positions := InitialPosition(area.start)
+	moves := 0
 
+	blizzards, moves = Move(area, blizzards, positions, moves)
 	part1 := moves
 
-	state2.start = initialState.goal
-	state2.goal = initialState.start
-	state2Map := make(map[aoc_library.Point]State)
-	state2Map[state2.start] = state2
-	state3, moves2 := Move(state2Map, moves)
+	part2start := area.goal
+	area.goal = area.start
+	area.start = part2start
+	positions = InitialPosition(part2start)
+	blizzards, moves = Move(area, blizzards, positions, moves)
 
-	state3.start = initialState.start
-	state3.goal = initialState.goal
-	state3Map := make(map[aoc_library.Point]State)
-	state3Map[state3.start] = state3
-	_, moves3 := Move(state3Map, moves2)
+	part2return := area.goal
+	area.goal = area.start
+	area.start = part2return
+	positions = InitialPosition(part2return)
+	_, moves = Move(area, blizzards, positions, moves)
 
-	part2 := moves3
+	part2 := moves
 
 	return part1, part2
 }
@@ -59,13 +59,11 @@ type Blizzard struct {
 	direction aoc_library.Point
 }
 
-type State struct {
-	height     int
-	width      int
-	start      aoc_library.Point
-	goal       aoc_library.Point
-	expedition aoc_library.Point
-	blizzards  []Blizzard
+type Area struct {
+	height int
+	width  int
+	start  aoc_library.Point
+	goal   aoc_library.Point
 }
 
 var directions = []aoc_library.Point{
@@ -76,103 +74,99 @@ var directions = []aoc_library.Point{
 	{X: 0, Y: 0},
 }
 
-func InitialState(grid [][]rune) State {
-	state := State{
+func ParseGrid(grid [][]rune) (Area, []Blizzard) {
+	area := Area{
 		height: len(grid),
 		width:  len(grid[0]),
 	}
+	var blizzards []Blizzard
 	for y, row := range grid {
 		for x, terrain := range row {
 			if terrain != '#' {
 				if terrain == '.' {
 					if y == 0 {
-						state.start = aoc_library.Point{X: x, Y: y}
-						state.expedition = state.start
+						area.start = aoc_library.Point{X: x, Y: y}
 					} else if y == len(grid)-1 {
-						state.goal = aoc_library.Point{X: x, Y: y}
+						area.goal = aoc_library.Point{X: x, Y: y}
 					}
 				} else {
 					blizzard := Blizzard{
 						position:  aoc_library.Point{X: x, Y: y},
 						direction: directions[strings.Index("^>v<", string(terrain))],
 					}
-					state.blizzards = append(state.blizzards, blizzard)
+					blizzards = append(blizzards, blizzard)
 				}
 			}
 		}
 	}
-	return state
+	return area, blizzards
 }
 
-func Move(states map[aoc_library.Point]State, moves int) (State, int) {
-	log.Printf("Moves: %v Possible states: %v", moves, len(states))
-	futureStates := make(map[aoc_library.Point]State)
-	for _, state := range states {
-		if state.expedition == state.goal {
-			return state, moves
-		}
-		nextState := UpdateState(state)
+func InitialPosition(point aoc_library.Point) map[aoc_library.Point]bool {
+	singleMapEntry := make(map[aoc_library.Point]bool)
+	singleMapEntry[point] = true
+	return singleMapEntry
+}
+
+func Move(area Area, blizzards []Blizzard, positions map[aoc_library.Point]bool, moves int) ([]Blizzard, int) {
+	futureBlizzards := UpdateBlizzards(area, blizzards)
+	futurePositions := make(map[aoc_library.Point]bool)
+	for position := range positions {
 		for _, direction := range directions {
-			if TryMove(nextState, direction) {
-				futureState := DoMove(nextState, direction)
-				futureStates[futureState.expedition] = futureState
-				//log.Printf("Move %v: at %v,%v possible move to %v,%v", moves,
-				//	state.expedition.X, state.expedition.Y,
-				//	nextState.expedition.X, nextState.expedition.Y)
+			if TryMove(area, futureBlizzards, position, direction) {
+				futurePosition := DoMove(position, direction)
+				if futurePosition == area.goal {
+					return futureBlizzards, moves + 1
+				}
+				futurePositions[futurePosition] = true
 			}
 		}
 	}
-	if len(futureStates) == 0 {
-		return State{}, 0
+	if len(futurePositions) == 0 {
+		return []Blizzard{}, 0
 	}
-	return Move(futureStates, moves+1)
+	return Move(area, futureBlizzards, futurePositions, moves+1)
 }
 
-func UpdateState(state State) State {
-	newState := State{
-		height:     state.height,
-		width:      state.width,
-		start:      state.start,
-		goal:       state.goal,
-		expedition: state.expedition,
-	}
-	for _, blizzard := range state.blizzards {
+func UpdateBlizzards(area Area, blizzards []Blizzard) []Blizzard {
+	var futureBlizzards []Blizzard
+	for _, blizzard := range blizzards {
 		x := blizzard.position.X + blizzard.direction.X
-		if x >= state.width-1 {
+		if x >= area.width-1 {
 			x = 1
 		}
 		if x <= 0 {
-			x = state.width - 2
+			x = area.width - 2
 		}
 		y := blizzard.position.Y + blizzard.direction.Y
-		if y >= state.height-1 {
+		if y >= area.height-1 {
 			y = 1
 		}
 		if y <= 0 {
-			y = state.height - 2
+			y = area.height - 2
 		}
 		nextBlizzard := Blizzard{
 			position:  aoc_library.Point{X: x, Y: y},
 			direction: blizzard.direction,
 		}
-		newState.blizzards = append(newState.blizzards, nextBlizzard)
+		futureBlizzards = append(futureBlizzards, nextBlizzard)
 	}
-	return newState
+	return futureBlizzards
 }
 
-func TryMove(state State, direction aoc_library.Point) bool {
-	x := state.expedition.X + direction.X
-	if x <= 0 || x >= state.width-1 {
+func TryMove(area Area, blizzards []Blizzard, position aoc_library.Point, direction aoc_library.Point) bool {
+	x := position.X + direction.X
+	if x <= 0 || x >= area.width-1 {
 		return false
 	}
-	y := state.expedition.Y + direction.Y
-	if y < 0 || y >= state.height {
+	y := position.Y + direction.Y
+	if y < 0 || y >= area.height {
 		return false
 	}
-	if (y == 0 || y == state.height-1) && x != state.start.X && x != state.goal.X {
+	if (y == 0 || y == area.height-1) && x != area.start.X && x != area.goal.X {
 		return false
 	}
-	for _, blizzard := range state.blizzards {
+	for _, blizzard := range blizzards {
 		if x == blizzard.position.X && y == blizzard.position.Y {
 			return false
 		}
@@ -180,13 +174,6 @@ func TryMove(state State, direction aoc_library.Point) bool {
 	return true
 }
 
-func DoMove(state State, direction aoc_library.Point) State {
-	return State{
-		height:     state.height,
-		width:      state.width,
-		start:      state.start,
-		goal:       state.goal,
-		expedition: aoc_library.Point{X: state.expedition.X + direction.X, Y: state.expedition.Y + direction.Y},
-		blizzards:  state.blizzards,
-	}
+func DoMove(position aoc_library.Point, direction aoc_library.Point) aoc_library.Point {
+	return aoc_library.Point{X: position.X + direction.X, Y: position.Y + direction.Y}
 }
